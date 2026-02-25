@@ -1,0 +1,17 @@
+C:\Users\me_la\source\repos\TheRandomizer\TheRandomizer\bin\Release\net10.0\TheRandomizer.deps.json
+C:\Users\me_la\source\repos\TheRandomizer\TheRandomizer\bin\Release\net10.0\TheRandomizer.dll
+C:\Users\me_la\source\repos\TheRandomizer\TheRandomizer\bin\Release\net10.0\TheRandomizer.pdb
+C:\Users\me_la\source\repos\TheRandomizer\TheRandomizer\bin\Release\net10.0\DiceRoller.dll
+C:\Users\me_la\source\repos\TheRandomizer\TheRandomizer\bin\Release\net10.0\LB.Utility.dll
+C:\Users\me_la\source\repos\TheRandomizer\TheRandomizer\bin\Release\net10.0\DiceRoller.pdb
+C:\Users\me_la\source\repos\TheRandomizer\TheRandomizer\bin\Release\net10.0\LB.Utility.pdb
+C:\Users\me_la\source\repos\TheRandomizer\TheRandomizer\obj\Release\net10.0\TheRandomizer.csproj.AssemblyReference.cache
+C:\Users\me_la\source\repos\TheRandomizer\TheRandomizer\obj\Release\net10.0\TheRandomizer.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\me_la\source\repos\TheRandomizer\TheRandomizer\obj\Release\net10.0\TheRandomizer.AssemblyInfoInputs.cache
+C:\Users\me_la\source\repos\TheRandomizer\TheRandomizer\obj\Release\net10.0\TheRandomizer.AssemblyInfo.cs
+C:\Users\me_la\source\repos\TheRandomizer\TheRandomizer\obj\Release\net10.0\TheRandomizer.csproj.CoreCompileInputs.cache
+C:\Users\me_la\source\repos\TheRandomizer\TheRandomizer\obj\Release\net10.0\TheRando.C1EA4B69.Up2Date
+C:\Users\me_la\source\repos\TheRandomizer\TheRandomizer\obj\Release\net10.0\TheRandomizer.dll
+C:\Users\me_la\source\repos\TheRandomizer\TheRandomizer\obj\Release\net10.0\refint\TheRandomizer.dll
+C:\Users\me_la\source\repos\TheRandomizer\TheRandomizer\obj\Release\net10.0\TheRandomizer.pdb
+C:\Users\me_la\source\repos\TheRandomizer\TheRandomizer\obj\Release\net10.0\ref\TheRandomizer.dll

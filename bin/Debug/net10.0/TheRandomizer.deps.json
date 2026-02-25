@@ -1,0 +1,247 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v10.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v10.0": {
+      "TheRandomizer/1.0.0": {
+        "dependencies": {
+          "DiceRoller": "1.0.0",
+          "JsonhCs": "6.5.0",
+          "LB.Utility": "1.0.0"
+        },
+        "runtime": {
+          "TheRandomizer.dll": {}
+        }
+      },
+      "BigReal/5.7.0": {
+        "dependencies": {
+          "LinkDotNet.StringBuilder": "3.4.1"
+        },
+        "runtime": {
+          "lib/net10.0/BigReal.dll": {
+            "assemblyVersion": "5.7.0.0",
+            "fileVersion": "5.7.0.0"
+          }
+        }
+      },
+      "JsonhCs/6.5.0": {
+        "dependencies": {
+          "BigReal": "5.7.0",
+          "LinkDotNet.StringBuilder": "3.4.1",
+          "ResultZero": "3.1.0"
+        },
+        "runtime": {
+          "lib/net10.0/JsonhCs.dll": {
+            "assemblyVersion": "6.5.0.0",
+            "fileVersion": "6.5.0.0"
+          }
+        }
+      },
+      "LinkDotNet.StringBuilder/3.4.1": {
+        "runtime": {
+          "lib/net10.0/LinkDotNet.StringBuilder.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "Markdig.Signed/0.44.0": {
+        "runtime": {
+          "lib/net9.0/Markdig.Signed.dll": {
+            "assemblyVersion": "0.44.0.0",
+            "fileVersion": "0.44.0.0"
+          }
+        }
+      },
+      "Microsoft.AspNetCore.Http.Abstractions/2.3.0": {
+        "dependencies": {
+          "Microsoft.AspNetCore.Http.Features": "2.3.0"
+        },
+        "runtime": {
+          "lib/netstandard2.0/Microsoft.AspNetCore.Http.Abstractions.dll": {
+            "assemblyVersion": "2.3.0.0",
+            "fileVersion": "2.3.0.25014"
+          }
+        }
+      },
+      "Microsoft.AspNetCore.Http.Features/2.3.0": {
+        "dependencies": {
+          "Microsoft.Extensions.Primitives": "8.0.0"
+        },
+        "runtime": {
+          "lib/netstandard2.0/Microsoft.AspNetCore.Http.Features.dll": {
+            "assemblyVersion": "2.3.0.0",
+            "fileVersion": "2.3.0.25014"
+          }
+        }
+      },
+      "Microsoft.AspNetCore.Mvc.Abstractions/2.3.9": {
+        "dependencies": {
+          "Microsoft.AspNetCore.Routing.Abstractions": "2.3.0",
+          "Microsoft.Net.Http.Headers": "2.3.8"
+        },
+        "runtime": {
+          "lib/netstandard2.0/Microsoft.AspNetCore.Mvc.Abstractions.dll": {
+            "assemblyVersion": "2.3.9.0",
+            "fileVersion": "2.3.9.26007"
+          }
+        }
+      },
+      "Microsoft.AspNetCore.Routing.Abstractions/2.3.0": {
+        "dependencies": {
+          "Microsoft.AspNetCore.Http.Abstractions": "2.3.0"
+        },
+        "runtime": {
+          "lib/netstandard2.0/Microsoft.AspNetCore.Routing.Abstractions.dll": {
+            "assemblyVersion": "2.3.0.0",
+            "fileVersion": "2.3.0.25014"
+          }
+        }
+      },
+      "Microsoft.Extensions.Primitives/8.0.0": {
+        "runtime": {
+          "lib/net8.0/Microsoft.Extensions.Primitives.dll": {
+            "assemblyVersion": "8.0.0.0",
+            "fileVersion": "8.0.23.53103"
+          }
+        }
+      },
+      "Microsoft.Net.Http.Headers/2.3.8": {
+        "dependencies": {
+          "Microsoft.Extensions.Primitives": "8.0.0"
+        },
+        "runtime": {
+          "lib/netstandard2.0/Microsoft.Net.Http.Headers.dll": {
+            "assemblyVersion": "2.3.8.0",
+            "fileVersion": "2.3.8.26006"
+          }
+        }
+      },
+      "ResultZero/3.1.0": {
+        "runtime": {
+          "lib/net10.0/ResultZero.dll": {
+            "assemblyVersion": "3.1.0.0",
+            "fileVersion": "3.1.0.0"
+          }
+        }
+      },
+      "DiceRoller/1.0.0": {
+        "runtime": {
+          "DiceRoller.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "LB.Utility/1.0.0": {
+        "dependencies": {
+          "Markdig.Signed": "0.44.0",
+          "Microsoft.AspNetCore.Mvc.Abstractions": "2.3.9"
+        },
+        "runtime": {
+          "LB.Utility.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      }
+    }
+  },
+  "libraries": {
+    "TheRandomizer/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "BigReal/5.7.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-o+ICb498p09o+dHOg33OKyKf3B9qISm4yi/sriwAIglEnD9R1GOmHP3GGBpL33tfYbjpP60NcRBS4kOHoHbrCQ==",
+      "path": "bigreal/5.7.0",
+      "hashPath": "bigreal.5.7.0.nupkg.sha512"
+    },
+    "JsonhCs/6.5.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-9VfZkRacMYFmF5lDTquPtuenEoY0HXQ6SJyle3zesbcgZ6z35VBbQDgGFKzbYw9wwseFpoNhdT5DOq4gPR662A==",
+      "path": "jsonhcs/6.5.0",
+      "hashPath": "jsonhcs.6.5.0.nupkg.sha512"
+    },
+    "LinkDotNet.StringBuilder/3.4.1": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-TnivM7AvNhIVLnJxir5tzl90GN9PAYzigGqv3ZXGg1+5HY1gj8XrUjCNoUYrUcm/UjozlOs4rENV41EqWyFPZg==",
+      "path": "linkdotnet.stringbuilder/3.4.1",
+      "hashPath": "linkdotnet.stringbuilder.3.4.1.nupkg.sha512"
+    },
+    "Markdig.Signed/0.44.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-mNxf8HrQA/clO8usqQhVc0BGlw0bJtZ76dic5KZGBPJZDX4UR67Jglwilkp5A//gPSMwcoY5EjLPppkZ/B4IMg==",
+      "path": "markdig.signed/0.44.0",
+      "hashPath": "markdig.signed.0.44.0.nupkg.sha512"
+    },
+    "Microsoft.AspNetCore.Http.Abstractions/2.3.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-39r9PPrjA6s0blyFv5qarckjNkaHRA5B+3b53ybuGGNTXEj1/DStQJ4NWjFL6QTRQpL9zt7nDyKxZdJOlcnq+Q==",
+      "path": "microsoft.aspnetcore.http.abstractions/2.3.0",
+      "hashPath": "microsoft.aspnetcore.http.abstractions.2.3.0.nupkg.sha512"
+    },
+    "Microsoft.AspNetCore.Http.Features/2.3.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-f10WUgcsKqrkmnz6gt8HeZ7kyKjYN30PO7cSic1lPtH7paPtnQqXPOveul/SIPI43PhRD4trttg4ywnrEmmJpA==",
+      "path": "microsoft.aspnetcore.http.features/2.3.0",
+      "hashPath": "microsoft.aspnetcore.http.features.2.3.0.nupkg.sha512"
+    },
+    "Microsoft.AspNetCore.Mvc.Abstractions/2.3.9": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-eUFI1TQjB5uXpbI9BvW5Z2bsQjx2ufF7s4h7gcrn69pePNiWHx3dWWysLA1p4U5VxF+XwKgXGWvYYixxfcgrmA==",
+      "path": "microsoft.aspnetcore.mvc.abstractions/2.3.9",
+      "hashPath": "microsoft.aspnetcore.mvc.abstractions.2.3.9.nupkg.sha512"
+    },
+    "Microsoft.AspNetCore.Routing.Abstractions/2.3.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-ZkFpUrSmp6TocxZLBEX3IBv5dPMbQuMs6L/BPl0WRfn32UVOtNYJQ0bLdh3cL9LMV0rmTW/5R0w8CBYxr0AOUw==",
+      "path": "microsoft.aspnetcore.routing.abstractions/2.3.0",
+      "hashPath": "microsoft.aspnetcore.routing.abstractions.2.3.0.nupkg.sha512"
+    },
+    "Microsoft.Extensions.Primitives/8.0.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-bXJEZrW9ny8vjMF1JV253WeLhpEVzFo1lyaZu1vQ4ZxWUlVvknZ/+ftFgVheLubb4eZPSwwxBeqS1JkCOjxd8g==",
+      "path": "microsoft.extensions.primitives/8.0.0",
+      "hashPath": "microsoft.extensions.primitives.8.0.0.nupkg.sha512"
+    },
+    "Microsoft.Net.Http.Headers/2.3.8": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-JO60u/VVUdaZfv4XQ//zgcH54y8rnxdpcvXnsDqWLKB4adDKaCiaozixDfQ/6H+PKYfkNV2CL8b8U+F9mciE3Q==",
+      "path": "microsoft.net.http.headers/2.3.8",
+      "hashPath": "microsoft.net.http.headers.2.3.8.nupkg.sha512"
+    },
+    "ResultZero/3.1.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-bowvC3i+QKRGqOAwKT/oBOoqk6VLXGFHMCZmy2JDo2sEJ2TiONCLu2lGgxB+DYlhR/t1b5Emqb+wF9sGo3Nnjg==",
+      "path": "resultzero/3.1.0",
+      "hashPath": "resultzero.3.1.0.nupkg.sha512"
+    },
+    "DiceRoller/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "LB.Utility/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}
