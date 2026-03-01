@@ -175,6 +175,9 @@
       "DiceRoller/1.0.0": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v10.0",
+        "dependencies": {
+          "LB.Utility": "1.0.0"
+        },
         "compile": {
           "bin/placeholder/DiceRoller.dll": {}
         },

@@ -15,3 +15,4 @@ C:\Users\me_la\source\repos\TheRandomizer\TheRandomizer\obj\Debug\net10.0\TheRan
 C:\Users\me_la\source\repos\TheRandomizer\TheRandomizer\obj\Debug\net10.0\refint\TheRandomizer.dll
 C:\Users\me_la\source\repos\TheRandomizer\TheRandomizer\obj\Debug\net10.0\TheRandomizer.pdb
 C:\Users\me_la\source\repos\TheRandomizer\TheRandomizer\obj\Debug\net10.0\ref\TheRandomizer.dll
+C:\Users\me_la\source\repos\TheRandomizer\TheRandomizer\obj\Debug\net10.0\TheRandomizer.sourcelink.json

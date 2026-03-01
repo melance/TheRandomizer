@@ -1,4 +1,4 @@
-﻿using TheRandomizer.Helpers;
+﻿using LB.Utility.Random;
 
 namespace TheRandomizer.Assignment;
 
@@ -16,7 +16,7 @@ internal static class WeightedSelection
         if (total == 0)
             throw new InvalidOperationException("Total weight is zero.");
 
-        var roll = (UInt64)RandomGen.NextInt64((Int64)total);
+        var roll = PseudoRNG.Instance?.NextUInt64(total) ?? 0;
         var sum = 0UL;
 
         foreach (var source in pool.Sources)

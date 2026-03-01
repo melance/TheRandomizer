@@ -5,7 +5,7 @@ using TheRandomizer.Assignment;
 using TheRandomizer.Enumerators;
 using TheRandomizer.Parameters;
 
-namespace TheRandomizer.Helpers;
+namespace TheRandomizer.Utility;
 
 internal static class Serialization
 {
@@ -33,7 +33,7 @@ internal static class Serialization
         }
     }
 
-    public static String Serialize<T>(T obj, FileFormatTypes type)
+    public static String Serialize<T>(T obj, FileFormatTypes type) where T : class
     {
         return type switch
         {
@@ -42,11 +42,11 @@ internal static class Serialization
         };
     }
 
-    public static T? Deserialize<T>(String text, FileFormatTypes type)
+    public static T? Deserialize<T>(String text, FileFormatTypes type) where T : class 
     {
         return type switch
         {
-            FileFormatTypes.Json => JsonSerializer.Deserialize<T>(text, JsonOptions),
+            FileFormatTypes.Json => DeserializeJson(text, typeof(T)) as T,
             _ => throw new Exception($"Unrecognized file format {type}."),
         };
     }

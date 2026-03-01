@@ -1,5 +1,6 @@
-﻿using System.Security.Cryptography;
-using TheRandomizer.Helpers;
+﻿using LB.Utility.Random;
+using System.Security.Cryptography;
+using TheRandomizer.Utility;
 
 namespace TheRandomizer.Assignment;
 
@@ -19,7 +20,7 @@ public class LineItemList : List<LineItem>
         if (IsDeck) return DrawRandomItem();
         if (Count == 1) return this.First();
 
-        var value = RandomGen.NextInt32(1, (Int32)TotalWeight);
+        var value = PseudoRNG.Instance?.NextUInt32(1, TotalWeight);
         var sum = 0u;
 
         foreach(var item in this)
@@ -43,7 +44,7 @@ public class LineItemList : List<LineItem>
         }
         else
         {
-            var value = RandomGen.NextInt32(1, (Int32)_deck.TotalWeight);
+            var value = PseudoRNG.Instance?.NextUInt32(1, _deck.TotalWeight);
             var sum = 0u;
             for (Int32 i = 0; i < _deck.Count; i++)
             {

@@ -1,12 +1,14 @@
 ﻿using DiceRoller;
 using LB.Utility.Collections;
 using LB.Utility.Extensions;
+using LB.Utility.Random;
 using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
 using TheRandomizer.Assignment.Parser;
-using TheRandomizer.Helpers;
 using TheRandomizer.Parameters;
+using TheRandomizer.Utility;
+using TheRandomizer.Pluralize;
 
 // ToDo: Potential upgrades
 // Deterministic RNG injection (for unit tests)
@@ -64,6 +66,32 @@ public partial class AssignmentGenerator : BaseGenerator
 
         return new GeneratorResult() { Text = output, Format = OutputFormat };
     }
+
+    public override List<String> VerifyDefinition()
+    {
+        var result = new List<String>();
+        foreach(var lineItemList in LineItems)
+        {
+            foreach(var lineItem in lineItemList.Value)
+            {
+                try
+                {
+                    var tokenizer = new Tokenizer(lineItem.Content);
+                    var parser = new Parser.Parser(tokenizer);
+                    parser.Parse();
+                }
+                catch (ParseException ex)
+                {
+                    result.Add($"Parser Error: {ex.Message} in group '{lineItemList.Key}");
+                }
+                catch (TokenizerException ex)
+                {
+                    result.Add($"Tokenizer Error: {ex.Message} in group '{lineItemList.Key}'");
+                }
+            }
+        }
+        return result;
+    }
     #endregion
 
     #region Private Methods
@@ -116,7 +144,7 @@ public partial class AssignmentGenerator : BaseGenerator
 
             if (!String.IsNullOrWhiteSpace(filePath))
             {               
-                var current = Path.Combine(filePath, resolved);
+                var current = Path.GetFullPath(Path.Combine(filePath, resolved));
                 if (File.Exists(current))
                     return current;
             }
@@ -136,11 +164,11 @@ public partial class AssignmentGenerator : BaseGenerator
         return SelectFromList(list);
     }
 
-    private LineItem SelectFromList(LineItemList list)
+    private static LineItem SelectFromList(LineItemList list)
     {
-        var totalWeight = (Int32)list.Sum(i => Math.Max(i.Weight, 1));
+        var totalWeight = (UInt32)list.Sum(i => Math.Max(i.Weight, 1));
 
-        var roll = RNG.NextInt32(totalWeight);
+        var roll = PseudoRNG.Instance?.NextUInt32(totalWeight);
         var sum = 0;
 
         foreach(var item in list)
@@ -208,7 +236,7 @@ public partial class AssignmentGenerator : BaseGenerator
         if (value is Boolean b) return b.ToString().ToLowerInvariant();
 
         if (value is LineItemList)
-            throw new AssignmentExpressionException("Expression evaluated to an ItemList. Did you forget to wrap it in Select(...)?");
+            throw new AssignmentExpressionException($"Expression '{expression}' evaluated to an ItemList. Did you forget to wrap it in Select(...)?");
 
         return value.ToString() ?? String.Empty;
     }
@@ -276,7 +304,7 @@ public partial class AssignmentGenerator : BaseGenerator
     {
         var value = Evaluate(n);
         if (value is Boolean b) return b;
-        throw new AssignmentExpressionException("Excpected Boolean.");
+        throw new AssignmentExpressionException($"Excpected Boolean. Got {value?.GetType()} : {(value ?? "null")}");
     }
 
     private Object? EvalCall(CallNode node)
@@ -304,8 +332,13 @@ public partial class AssignmentGenerator : BaseGenerator
             "left" => FuncLeft(node.Arguments),
             "right" => FuncRight(node.Arguments),
             "length" => FuncLength(node.Arguments),
+            "plural" => FuncPlural(node.Arguments),
+            "singular" => FuncSingular(node.Arguments),
             // 
             "generate" => FuncGenerate(node.Arguments),
+            // Conversions
+            "bool" => FuncBool(node.Arguments),
+            "int" => FuncInt(node.Arguments),
             _ => throw new AssignmentExpressionException($"Unknown function '{node.Name}'."),
         };
     }
@@ -323,7 +356,7 @@ public partial class AssignmentGenerator : BaseGenerator
         if (l is String ls && r is String rs)
             return ls.Equals(rs, StringComparison.InvariantCultureIgnoreCase);
 
-        throw new AssignmentExpressionException("== and != require matching types.");
+        throw new AssignmentExpressionException($"== and != require matching types. Got {FormatVar(l)} and {FormatVar(r)}.");
 
     }
 
@@ -338,7 +371,7 @@ public partial class AssignmentGenerator : BaseGenerator
         {
             String name => ResolveList(name),
             LineItemList list => list,
-            _ => throw new AssignmentExpressionException($"Expected ItemListName or ItemList, got {value?.GetType()}")
+            _ => throw new AssignmentExpressionException($"Expected ItemListName or ItemList, got {FormatVar(value)}")
         };
     }
 
@@ -426,7 +459,7 @@ public partial class AssignmentGenerator : BaseGenerator
     /// <summary>
     /// Evaluates the provided Dice Roller expression
     /// </summary>
-    private String FuncEval(List<Node> nodes)
+    private Int32 FuncEval(List<Node> nodes)
     {
         if (nodes.Count != 1)
             throw new AssignmentExpressionException("Eval(formula)", "Takes exactly one argument.");
@@ -441,7 +474,7 @@ public partial class AssignmentGenerator : BaseGenerator
             if (variable.Value is Int32 i)
                 dice.Variables.Add(variable.Key, i);
         }
-        return dice.Roll(expression).ToString();
+        return (Int32)dice.Roll(expression);
     }
 
     /// <summary>
@@ -515,7 +548,7 @@ public partial class AssignmentGenerator : BaseGenerator
             values.Add(str);
         }
 
-        return values[RNG.NextInt32(values.Count)];
+        return values[(Int32)(PseudoRNG.Instance?.NextUInt32((UInt32)values.Count) ?? 0)];
     }
 
     /// <summary>
@@ -691,16 +724,10 @@ public partial class AssignmentGenerator : BaseGenerator
 
         var lists = nodes.Select(EvalListArgument).ToList();
 
-        var total = lists.Sum(l => (Int32)Math.Max(l.TotalWeight, 1U));
-        var roll = RNG.NextInt32(total);
+        var total = (UInt32)lists.Sum(l => (Int32)Math.Max(l.TotalWeight, 1U));
+        var roll = PseudoRNG.Instance?.NextUInt32((UInt32)nodes.Count)!;
 
-        var sum = 0;
-        foreach (var list in lists)
-        {
-            sum += (Int32)Math.Max(list.TotalWeight, 1U);
-            if (roll < sum) return list;
-        }
-        return lists.Last();
+        return lists[(Int32)roll];
     }
 
     /// <summary>
@@ -782,6 +809,40 @@ public partial class AssignmentGenerator : BaseGenerator
         return haystack.Contains(needle);
     }
 
+    private Boolean FuncBool(List<Node> nodes)
+    {
+        if (nodes.Count != 1)
+            throw new AssignmentExpressionException("Bool(value)", "Expects exactly one argument.");
+
+        var valueObj = Evaluate(nodes[0]) ?? false;
+
+        if (valueObj is Boolean b) return b;
+        if (valueObj is String s)
+        {
+            if (Boolean.TryParse(s, out var result)) return result;
+            else throw new AssignmentExpressionException("Bool(value)", $"Could not convert '{valueObj}' to a boolean.");
+        }
+
+        return false;
+    }
+
+    private Int32 FuncInt(List<Node> nodes)
+    {
+        if (nodes.Count != 1)
+            throw new AssignmentExpressionException("Int(value)", "Expects exactly one argument.");
+
+        var valueObj = Evaluate(nodes[0]) ?? 0;
+
+        if (valueObj is Int32 i) return i;
+        if (valueObj is String s)
+        {
+            if (Int32.TryParse(s, out var result)) return result;
+            else throw new AssignmentExpressionException("Int(value)", $"Could not convert '{valueObj}' to an integer.");
+        }
+
+        return 0;
+    }
+
     /// <summary>
     /// Performs an If branch
     /// </summary>
@@ -815,6 +876,19 @@ public partial class AssignmentGenerator : BaseGenerator
         return TextInfo.ToLower(s);
     }
 
+    private String FuncPlural(List<Node> nodes)
+    {
+        if (nodes.Count != 1)
+            throw new AssignmentExpressionException("Plural(string)", "Requires exactly one argument.");
+
+        var value = Evaluate(nodes[0]);
+
+        if (value is not String s)
+            throw new AssignmentExpressionException("Plural(string)", "Expects a string.");
+
+        return Pluralizer.Pluralize(s);
+    }
+
     [GeneratedRegex("[?.!]\\s+[a-z]")]
     private static partial Regex SentenceRegex();
 
@@ -836,6 +910,19 @@ public partial class AssignmentGenerator : BaseGenerator
         s = r.Replace(s, m => m.Value.ToUpper());
 
         return s;
+    }
+
+    private String FuncSingular(List<Node> nodes)
+    {
+        if (nodes.Count != 1)
+            throw new AssignmentExpressionException("Plural(string)", "Requires exactly one argument.");
+
+        var value = Evaluate(nodes[0]);
+
+        if (value is not String s)
+            throw new AssignmentExpressionException("Plural(string)", "Expects a string.");
+
+        return Pluralizer.Singularize(s);
     }
 
     /// <summary>
@@ -877,9 +964,7 @@ public partial class AssignmentGenerator : BaseGenerator
     /// </summary>
     private Object? ReadVariable(String name)
     {
-        if (!Variables.TryGetValue(name, out var value))
-            throw new AssignmentExpressionException($"Variable '@{name}' is not defined.");
-        return value;
+        return Variables.GetValue(name, null);
     }
 
     /// <summary>
@@ -965,7 +1050,8 @@ public partial class AssignmentGenerator : BaseGenerator
         return (-1, -1);
     }
 
-    private static String UnescapeBrackets(String value) => value.Replace(@"\[", "[").Replace(@"\]", "]");        
+    private static String UnescapeBrackets(String value) => value.Replace(@"\[", "[").Replace(@"\]", "]");
+    private static String FormatVar(Object? v) => $"{v?.GetType()} ({v ?? "null"})";
     #endregion
     #endregion
 }

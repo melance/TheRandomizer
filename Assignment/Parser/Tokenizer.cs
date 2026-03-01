@@ -259,7 +259,7 @@ internal sealed class Tokenizer(String expression)
     private Token ReadUnionOrAnd()
     {
         var position = Index;
-        if (Peek(0) == '&')
+        if (Peek(1) == '&')
         {
             Index += 2;
             return new Token(TokenTypes.And, "&&", position);

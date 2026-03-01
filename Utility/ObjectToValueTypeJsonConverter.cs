@@ -1,7 +1,7 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace TheRandomizer.Helpers;
+namespace TheRandomizer.Utility;
 
 internal class ObjectToValueTypeJsonConverter : JsonConverter<Object>
 {
