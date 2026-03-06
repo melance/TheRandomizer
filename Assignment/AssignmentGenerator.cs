@@ -3,12 +3,15 @@ using LB.Utility.Collections;
 using LB.Utility.Extensions;
 using LB.Utility.Random;
 using System.Globalization;
+using System.Linq.Expressions;
+using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using TheRandomizer.Assignment.Parser;
 using TheRandomizer.Parameters;
-using TheRandomizer.Utility;
 using TheRandomizer.Pluralize;
+using TheRandomizer.Utility;
 
 // ToDo: Potential upgrades
 // Deterministic RNG injection (for unit tests)
@@ -18,6 +21,37 @@ namespace TheRandomizer.Assignment;
 
 public partial class AssignmentGenerator : BaseGenerator
 {
+    private static Dictionary<String, Func<List<Node>, Object?>>? _functions;
+
+    private static Dictionary<String, Func<List<Node>, Object?>> BuildFunctionRegistry(AssignmentGenerator target)
+    {
+        var result = new Dictionary<String, Func<List<Node>, Object?>>(StringComparer.InvariantCultureIgnoreCase);
+        var methods = typeof(AssignmentGenerator).GetMethods(BindingFlags.NonPublic | BindingFlags.Instance);
+
+        foreach (var method in methods)
+        {
+            var attr = method.GetCustomAttribute<FunctionAttribute>();
+            if (attr != null)
+            {
+                var parameters = Expression.Parameter(typeof(List<Node>), "nodes");
+                var instance = Expression.Constant(target);
+                var call = Expression.Call(instance, method, parameters);
+
+                var body = Expression.Convert(call, typeof(Object));
+                var lambda = Expression.Lambda<Func<List<Node>, Object?>>(body, parameters).Compile();
+                result[attr.Name] = lambda;
+            }
+        }
+        
+
+        return result;
+    }
+
+    public AssignmentGenerator() : base() 
+    {
+        _functions = BuildFunctionRegistry(this);
+    }
+
     #region Enumerators
     #endregion
 
@@ -47,7 +81,7 @@ public partial class AssignmentGenerator : BaseGenerator
     #region Public Methods
     public override GeneratorResult Generate(params BaseParameter[] parameters)
     {
-        if (LineItems.Sum(li => li.Value.Count) == 0) throw new DefinitionException($"Markov definition \"{Name}\" has no line items.");
+        if (LineItems.Sum(li => li.Value.Count) == 0) throw new DefinitionException($"Assignment definition \"{Name}\" has no line items.");
         LoopCount = 0;
         RecursionDepth = 0;
 
@@ -56,7 +90,8 @@ public partial class AssignmentGenerator : BaseGenerator
         if (!PreProcessParameters())
             throw new ParameterValidationException(Parameters.ErrorList);
 
-        var startItem = SelectLineItem(START_ITEM);
+        var startItem = SelectLineItem(START_ITEM) 
+                        ?? throw new Exception("Start list is empty");
         var output = Render(startItem.Content);
 
         if (RemoveEmptyLines)
@@ -158,14 +193,15 @@ public partial class AssignmentGenerator : BaseGenerator
         return String.Join('\n', lines.Where(l => !String.IsNullOrWhiteSpace(l)));
     }
 
-    private LineItem SelectLineItem(String name)
+    private LineItem? SelectLineItem(String name)
     {
         var list = ResolveList(name);
         return SelectFromList(list);
     }
 
-    private static LineItem SelectFromList(LineItemList list)
+    private static LineItem? SelectFromList(LineItemList list)
     {
+        if (list.Count == 0) return null;
         var totalWeight = (UInt32)list.Sum(i => Math.Max(i.Weight, 1));
 
         var roll = PseudoRNG.Instance?.NextUInt32(totalWeight);
@@ -219,26 +255,35 @@ public partial class AssignmentGenerator : BaseGenerator
     #region Evaluation
     private String EvaluateExpression(String expression)
     {
-        if (IsBareIdentifier(expression))
+        try
         {
-            var item = SelectLineItem(expression);
-            return Render(item.Content);
+            if (IsBareIdentifier(expression))
+            {
+                var item = SelectLineItem(expression);
+                if (item == null) return String.Empty;
+                return Render(item.Content);
+            }
+
+            var ast = new Parser.Parser(expression).Parse();
+            var value = Evaluate(ast);
+
+            if (value is null)
+                return String.Empty;
+
+            if (value is String str) return str;
+            if (value is Int32 n) return n.ToString();
+            if (value is Boolean b) return b.ToString().ToLowerInvariant();
+
+            if (value is LineItemList)
+                throw new AssignmentExpressionException($"Expression '{expression}' evaluated to an ItemList. Did you forget to wrap it in Select(...)?");
+
+            return value.ToString() ?? String.Empty;
         }
-
-        var ast = new Parser.Parser(expression).Parse();
-        var value = Evaluate(ast);
-
-        if (value is null)
-            return String.Empty;
-
-        if (value is String str) return str;
-        if (value is Int32 n) return n.ToString();
-        if (value is Boolean b) return b.ToString().ToLowerInvariant();
-
-        if (value is LineItemList)
-            throw new AssignmentExpressionException($"Expression '{expression}' evaluated to an ItemList. Did you forget to wrap it in Select(...)?");
-
-        return value.ToString() ?? String.Empty;
+        catch (Exception ex)
+        {
+            ex.Data.Add(nameof(expression), expression);
+            throw;
+        }
     }
 
     private Object? Evaluate(Node node)
@@ -309,38 +354,9 @@ public partial class AssignmentGenerator : BaseGenerator
 
     private Object? EvalCall(CallNode node)
     {
-        return node.Name.ToLowerInvariant() switch
-        {
-            "select" => FuncSelect(node.Arguments),
-            "union" => FuncUnion(node.Arguments),
-            "oneof" => FuncOneOf(node.Arguments),
-            "concat" => FuncConcat(node.Arguments),
-            "pick" => FuncPick(node.Arguments),
-            "from" => FuncFrom(node.Arguments),
-            "keyof" => FuncKeyOf(node.Arguments),
-            "eval" => FuncEval(node.Arguments),
-            "repeat" => FuncRepeat(node.Arguments),
-            "weight" => FuncWeight(node.Arguments),
-            "if" => FuncIf(node.Arguments),
-            // String Manipulation
-            "lower" => FuncLower(node.Arguments),
-            "title" => FuncTitle(node.Arguments),
-            "sentence" => FuncSentence(node.Arguments),
-            "upper" => FuncUpper(node.Arguments),
-            "substring" => FuncSubString(node.Arguments),
-            "contains" => FuncContains(node.Arguments),
-            "left" => FuncLeft(node.Arguments),
-            "right" => FuncRight(node.Arguments),
-            "length" => FuncLength(node.Arguments),
-            "plural" => FuncPlural(node.Arguments),
-            "singular" => FuncSingular(node.Arguments),
-            // 
-            "generate" => FuncGenerate(node.Arguments),
-            // Conversions
-            "bool" => FuncBool(node.Arguments),
-            "int" => FuncInt(node.Arguments),
-            _ => throw new AssignmentExpressionException($"Unknown function '{node.Name}'."),
-        };
+        if (!_functions!.TryGetValue(node.Name, out var function))
+            throw new AssignmentExpressionException($"Unknown function '{node.Name}'.");
+        return function.Invoke(node.Arguments);
     }
 
     /// <summary>
@@ -429,14 +445,15 @@ public partial class AssignmentGenerator : BaseGenerator
     }
     #endregion
 
-    #region Functions
-    
+    #region Functions    
     #region String Result Methods
     /// <summary>
     /// Concatenates one or more primitive values into a single string
     /// </summary>
+    [Function("Concat", "Concat(a, b, ...)", MinArguments = 1)]
     private String FuncConcat(List<Node> nodes)
     {
+        CheckArity(nodes);
         var builder = new StringBuilder();
         foreach (var node in nodes)
         {
@@ -459,20 +476,20 @@ public partial class AssignmentGenerator : BaseGenerator
     /// <summary>
     /// Evaluates the provided Dice Roller expression
     /// </summary>
-    private Int32 FuncEval(List<Node> nodes)
+    [Function("Calc", "Calc(formula)", MinArguments = 1, MaxArguments = 1)]
+    private Int32 FuncCalc(List<Node> nodes)
     {
-        if (nodes.Count != 1)
-            throw new AssignmentExpressionException("Eval(formula)", "Takes exactly one argument.");
+        CheckArity(nodes);
 
-        var value = Evaluate(nodes[0]);
-        if (value is not String expression)
-            throw new AssignmentExpressionException("Eval(formula)", "Expects a string.");
+        var expression = EvalAs<String>(nodes, 0);
 
         var dice = new Dice();
         foreach(var variable in Variables)
         {
-            if (variable.Value is Int32 i)
-                dice.Variables.Add(variable.Key, i);
+            if (variable.Value is Int32 i32)
+                dice.Variables[variable.Key] = i32;
+            if (variable.Value is Int64 i64)
+                dice.Variables[variable.Key] = i64;
         }
         return (Int32)dice.Roll(expression);
     }
@@ -480,16 +497,13 @@ public partial class AssignmentGenerator : BaseGenerator
     /// <summary>
     /// Runs an external generator and returns the resulting text
     /// </summary>
+    [Function("Generate", "Generate(path[,param_name,param_value,...]", MinArguments = 1)]
     private String FuncGenerate(List<Node> nodes)
     {
-        if (nodes.Count < 1)
-            throw new AssignmentExpressionException("Generate(path[,param_name,param_value,...])", "Takes one or more arguments.");
+        CheckArity(nodes);
 
-        var filePathObj = Evaluate(nodes[0]);
+        var filePath = EvalAs<String>(nodes, 0);
         var parameters = new ParameterList();
-
-        if (filePathObj is not String filePath)
-            throw new AssignmentExpressionException("Generate(path[,param_name,param_value,...])", "Expects a first argument of type string.");
 
         filePath = ResolveFilePath(filePath);
 
@@ -505,7 +519,8 @@ public partial class AssignmentGenerator : BaseGenerator
             parameters.Add(paramName, paramValue);
         }
 
-        var generator = BaseGenerator.Deserialize(filePath) ?? throw new AssignmentExpressionException("Generate(path[,param_name,param_value,...])", $"Unable to load generator, '{filePath}'.");
+        var generator = Deserialize(filePath)
+                        ?? throw new AssignmentExpressionException("Generate(path[,param_name,param_value,...])", $"Unable to load generator, '{filePath}'.");
 
         generator.Parameters = parameters;
         return generator.Generate().Text;
@@ -514,72 +529,87 @@ public partial class AssignmentGenerator : BaseGenerator
     /// <summary>
     /// Concatenates the list of strings into a Item List Name
     /// </summary>
+    [Function("KeyOf", "KeyOf(a,b,...)", MinArguments = 1)]
     private String FuncKeyOf(List<Node> nodes)
     {
-        if (nodes.Count == 0)
-            throw new AssignmentExpressionException("KeyOf(a,b,...)", "Requires at least one argument.");
+        CheckArity(nodes);
 
         var builder = new StringBuilder();
-        foreach (var node in nodes)
+        for (var i = 0; i < nodes.Count; i++)
         {
-            var value = Evaluate(node);
-            if (value is not String name)
-                throw new AssignmentExpressionException("KeyOf(a,b,...)", "Expects ItemListName arguments.");
-
+            var name = EvalAs<String>(nodes, i);
             var item = SelectLineItem(name);
+            if (item == null) return String.Empty;
             builder.Append(Render(item.Content));
         }
         return builder.ToString();
     }
 
+    [Function("Max", "Max(a,b,...)", MinArguments = 1)]
+    private Int32 FuncMax(List<Node> nodes)
+    {
+        CheckArity(nodes);
+        var values = EvalAllAs<Int32>(nodes);
+        return values.Max();
+    }
+
+    [Function("Min", "Min(a,b,...)", MinArguments = 1)]
+    private Int32 FuncMin(List<Node> nodes)
+    {
+        CheckArity(nodes);
+        var values = EvalAllAs<Int32>(nodes);
+        return values.Min();
+    }
+
     /// <summary>
     /// Selects one string from the provided list
     /// </summary>
+    [Function("Pick", "Pick(a,b,...)", MinArguments = 1)]
     private String FuncPick(List<Node> nodes)
     {
-        if (nodes.Count == 0)
-            throw new AssignmentExpressionException("Pick(a, b, ...)", "Requires at least one argument.");
-        var values = new List<String>();
-        foreach (var node in nodes)
+        CheckArity(nodes);
+        
+        var values = new List<String>();        
+        for (var i = 0; i < nodes.Count; i++)
         {
-            var value = Evaluate(node);
-            if (value is not string str)
-                throw new AssignmentExpressionException("Pick(a, b, ...)", "Only accepts string arguments.");
-            values.Add(str);
+            var value = EvalAs<String>(nodes, i);
+            values.Add(value);
         }
 
         return values[(Int32)(PseudoRNG.Instance?.NextUInt32((UInt32)values.Count) ?? 0)];
     }
 
+    [Function("Random", "Random([min, ] max)", MinArguments = 1)]
+    private Int32 FuncRandom(List<Node> nodes)
+    {
+        CheckArity(nodes);
+
+        var min = nodes.Count == 1 ? 0 : EvalAs<Int32>(nodes, 0);
+        var max = nodes.Count == 1 ? EvalAs<Int32>(nodes, 0) : EvalAs<Int32>(nodes, 1);
+
+        return PseudoRNG.Instance!.NextInt32(min, max);
+    }
+
     /// <summary>
     /// Selects an item from the provided Item List Count times and returns them as a string
     /// </summary>
+    [Function("Repeat", "Repeat(list, count[, seperator])", MinArguments = 2, MaxArguments = 3)]
     private String FuncRepeat(List<Node> nodes)
     {
-        if (nodes.Count < 2 || nodes.Count > 3)
-            throw new AssignmentExpressionException("Repeat(list, count[, seperator])", "Expects two or three arguments.");
-
+        CheckArity(nodes);
+        
         var list = EvalListArgument(nodes[0]);
 
-        var countObj = Evaluate(nodes[1]);
+        var count = EvalAs<Int32>(nodes,1);
 
-        if (countObj is not Int32 count || count <= 0)
-            throw new AssignmentExpressionException("Repeat(list count[, seperator])", "Count must be a positive integer.");
-
-        String seperator = String.Empty;
-        if (nodes.Count == 3)
-        {
-            var seperatorObj = Evaluate(nodes[2]);
-            if (seperatorObj is not String s)
-                throw new AssignmentExpressionException("Repeat(list count[, seperator])", "Seperator must be a string.");
-            seperator = s;
-        }
-
+        var seperator = nodes.Count == 3 ? EvalAs<String>(nodes, 2) : String.Empty;
+        
         var items = new List<String>();
 
         for (Int32 i = 0; i < count; i++)
         {
             var item = list.IsDeck ? list.DrawRandomItem() : SelectFromList(list);
+            if (item == null) return String.Empty;
             items.Add(Render(item.Content));
         }
 
@@ -589,112 +619,87 @@ public partial class AssignmentGenerator : BaseGenerator
     /// <summary>
     /// Selects an item from the Line Item List provided
     /// </summary>
+    [Function("Select", "Select(x)", MinArguments = 1, MaxArguments = 1)]
     private String FuncSelect(List<Node> nodes)
     {
-        if (nodes.Count != 1)
-            throw new AssignmentExpressionException("Select(x)", "Takes exactly one argument.");
+        CheckArity(nodes);
 
         var value = Evaluate(nodes[0]);
 
         if (value is String listName)
         {
             var item = SelectLineItem(listName);
+            if (item == null) return String.Empty;
             return Render(item.Content);
         }
 
         if (value is LineItemList list)
         {
             var item = SelectFromList(list);
+            if (item == null) return String.Empty;
             return Render(item.Content);
         }
 
-        throw new AssignmentExpressionException("Select(x)", $"Expected ItemListName or ItemList, got {value?.GetType().Name ?? "null"}.");
+        throw new AssignmentExpressionException(FunctionAttribute.GetDefinition(), $"Expected ItemListName or ItemList, got {value?.GetType().Name ?? "null"}.");
     }
 
     /// <summary>
     /// Selects a portion of a string defined by the start and end values
     /// </summary>
+    [Function("SubString", "SubString(string[, start], end)", MinArguments = 2, MaxArguments = 3)]
     private String FuncSubString(List<Node> nodes)
     {
-        if (nodes.Count < 2 || nodes.Count > 3)
-            throw new AssignmentExpressionException("SubString(s,n[,n])", "Takes two or three arguments.");
+        CheckArity(nodes);
 
-        var value = Evaluate(nodes[0]);
+        var value = EvalAs<String>(nodes, 0);
+                
+        var start = nodes.Count == 2 ? EvalAs<Int32>(nodes, 1) : 0;
+        var end = EvalAs<Int32>(nodes, nodes.Count - 1);
 
-        if (value is not String s)
-            throw new AssignmentExpressionException("Substring(s,n[,n])", "Expects a first argument type of string.");
-
-        var startObj = nodes.Count == 2 ? Evaluate(nodes[1]) : 0;
-        var endObj = Evaluate(nodes.Last());
-
-        if (!EvalNumber(startObj, out var start))
-            throw new AssignmentExpressionException("Substring(s,n[,n])", "Expects a start value of type number.");
-        if (!EvalNumber(endObj,out var end))
-            throw new AssignmentExpressionException("Substring(s,n[,n])", "Expects an end value of type number.");
-        if (start < 0 || start > s.Length)
-            throw new AssignmentExpressionException("Substring(s,n[,n])", "Start value is out of range.");
-        if (end < 0 || end > s.Length)
-            throw new AssignmentExpressionException("Substring(s,n[,n])", "End value is out of range.");
+        if (start < 0 || start > value.Length)
+            throw new AssignmentExpressionException(FunctionAttribute.GetDefinition(), "Start value is out of range.");
+        if (end < 0 || end > value.Length)
+            throw new AssignmentExpressionException(FunctionAttribute.GetDefinition(), "End value is out of range.");
         if (end < start)
-            throw new AssignmentExpressionException("Substring(s,n[,n])", "End value is smaller than start value.");
+            throw new AssignmentExpressionException(FunctionAttribute.GetDefinition(), "End value is smaller than start value.");
 
         var range = new Range(start, end);
-        return s[range];
+        return value[range];
     }
 
     /// <summary>
     /// Selects the left portion of a string
     /// </summary>
+    [Function("Left", "Left(string, length)", MinArguments = 2, MaxArguments = 2)]
     private String FuncLeft(List<Node> nodes)
     {
-        if (nodes.Count != 2)
-            throw new AssignmentExpressionException("Left(s,n)", "Takes exactly two arguments.");
-        
-        var value = Evaluate(nodes[0]);
-        if (value is not String s)
-            throw new AssignmentExpressionException("Left(s,n)", "Expects a first argument of type string.");
-
-        var lengthObj = Evaluate(nodes[1]);
-
-        if (!EvalNumber(lengthObj, out var length))
-            throw new AssignmentExpressionException("Left(s,n)", "Expects a second argument of number.");
-
-        return s[length..];
+        CheckArity(nodes);        
+        var value = EvalAs<String>(nodes, 0);
+        var length = EvalAs<Int32>(nodes, 1);
+        return value[length..];
     }
 
     /// <summary>
     /// Selects the left portion of a string
     /// </summary>
+    [Function("Right", "Right(string, length)", MinArguments = 2, MaxArguments = 2)]
     private String FuncRight(List<Node> nodes)
     {
-        if (nodes.Count != 2)
-            throw new AssignmentExpressionException("Right(s,n)", "Takes exactly two arguments.");
-
-        var value = Evaluate(nodes[0]);
-        if (value is not String s)
-            throw new AssignmentExpressionException("Right(s,n)", "Expects a first argument of type string.");
-
-        var lengthObj = Evaluate(nodes[1]);
-
-        if (!EvalNumber(lengthObj, out var length))
-            throw new AssignmentExpressionException("Right(s,n)", "Expects a second argument of number.");
-
-        return s.Right(length);
+        CheckArity(nodes);
+        var value = EvalAs<String>(nodes, 0);        
+        var length = EvalAs<Int32>(nodes, 1);
+        return value.Right(length);
     }
 
     /// <summary>
     /// Returns the length of a string
     /// </summary>
+    [Function("Length", "Length(string)", MinArguments = 1, MaxArguments = 1)]
     private Int32 FuncLength(List<Node> nodes)
     {
-        if (nodes.Count != 1)
-            throw new AssignmentExpressionException("Length(s)", "Takes exactly one argument.");
-
-        var value = Evaluate(nodes[0]);
-        if (value is not String s)
-            throw new AssignmentExpressionException("Length(s)", "Expects a first argument of type string.");
-
-        return s.Length;
+        CheckArity(nodes);
+        var value = EvalAs<String>(nodes, 0);
+        return value.Length;
     }
     #endregion
 
@@ -702,25 +707,20 @@ public partial class AssignmentGenerator : BaseGenerator
     /// <summary>
     /// Retrieves the Item List for the provided Item List Name
     /// </summary>
+    [Function("From", "From(key)", MinArguments = 1, MaxArguments = 1)]
     private LineItemList FuncFrom(List<Node> nodes)
     {
-        if (nodes.Count != 1)
-            throw new AssignmentExpressionException("From(key)", "Takes exactly one argument.");
-
-        var value = Evaluate(nodes[0]);
-        if (value is not String key)
-            throw new AssignmentExpressionException("From(key)", "Expects a string.");
-
-        return ResolveList(key);
+        CheckArity(nodes);
+        return ResolveList(EvalAs<String>(nodes, 0));
     }
 
     /// <summary>
     /// Chooses one of the provided Item lists and selects a value from it.
     /// </summary>
+    [Function("OneOf", "OneOf(a,b,...)", MinArguments = 1)]
     private LineItemList FuncOneOf(List<Node> nodes)
     {
-        if (nodes.Count == 0)
-            throw new AssignmentExpressionException("OneOf(a,b,...)", "Requires at least 1 argument.");
+        CheckArity(nodes);
 
         var lists = nodes.Select(EvalListArgument).ToList();
 
@@ -733,10 +733,10 @@ public partial class AssignmentGenerator : BaseGenerator
     /// <summary>
     /// Joins two Item Lists into a single list
     /// </summary>
+    [Function("Union", "Union(a,b,...)", MinArguments = 1)]
     private LineItemList FuncUnion(List<Node> nodes)
     {
-        if (nodes.Count == 0)
-            throw new AssignmentExpressionException("Union(a,b,...)", "Requires at least one argument.");
+        CheckArity(nodes);
 
         var result = new LineItemList();
 
@@ -752,17 +752,14 @@ public partial class AssignmentGenerator : BaseGenerator
     /// <summary>
     /// Adds weight to the Lists provided
     /// </summary>
+    [Function("Weight", "Weight(list, factor)", MinArguments = 2, MaxArguments = 2)]
     private LineItemList FuncWeight(List<Node> nodes)
     {
-        if (nodes.Count != 2)
-            throw new AssignmentExpressionException("Weight", "Function requires exactly two operands.");
+        CheckArity(nodes);
 
         var list = EvalListArgument(nodes[0]);
 
-        var weightObj = Evaluate(nodes[1]);
-        if (weightObj is not Int32 weight)
-            throw new AssignmentExpressionException("Weight", "Must be a number.");
-
+        var weight = EvalAs<Int32>(nodes, 1);
         var result = new LineItemList
         {
             IsDeck = list.IsDeck,
@@ -789,47 +786,36 @@ public partial class AssignmentGenerator : BaseGenerator
     /// <summary>
     /// Returns true if haystack contains needle
     /// </summary>
-    /// <param name="nodes"></param>
-    /// <returns></returns>
+    [Function("Contains", "Contains(haystack, needle)", MinArguments = 2, MaxArguments = 2)]
     private Boolean FuncContains(List<Node> nodes)
     {
-        if (nodes.Count != 2)
-            throw new AssignmentExpressionException("Contains(haystack, needle)", "Expects exactly two arguments.");
-        
-        var haystackObj = Evaluate(nodes[0]);
-
-        if (haystackObj is not String haystack)
-            throw new AssignmentExpressionException("Contains(haystack, needle)", "Haystack must be a string.");
-
-        var needleObj = Evaluate(nodes[1]);
-
-        if (needleObj is not String needle)
-            throw new AssignmentExpressionException("Contains(haystack, needle)", "Needle must be a string.");
-
+        CheckArity(nodes);
+        var haystack = EvalAs<String>(nodes, 0);
+        var needle = EvalAs<String>(nodes, 1);
         return haystack.Contains(needle);
     }
 
+    [Function("Bool", "Bool(value)", MinArguments = 1, MaxArguments = 1)]
     private Boolean FuncBool(List<Node> nodes)
     {
-        if (nodes.Count != 1)
-            throw new AssignmentExpressionException("Bool(value)", "Expects exactly one argument.");
-
+        CheckArity(nodes);
+        
         var valueObj = Evaluate(nodes[0]) ?? false;
 
         if (valueObj is Boolean b) return b;
         if (valueObj is String s)
         {
             if (Boolean.TryParse(s, out var result)) return result;
-            else throw new AssignmentExpressionException("Bool(value)", $"Could not convert '{valueObj}' to a boolean.");
+            else throw new AssignmentExpressionException(FunctionAttribute.GetDefinition(), $"Could not convert '{valueObj}' to a boolean.");
         }
 
         return false;
     }
 
+    [Function("Int", "Int(value)", MinArguments = 1, MaxArguments = 1)]
     private Int32 FuncInt(List<Node> nodes)
     {
-        if (nodes.Count != 1)
-            throw new AssignmentExpressionException("Int(value)", "Expects exactly one argument.");
+        CheckArity(nodes);
 
         var valueObj = Evaluate(nodes[0]) ?? 0;
 
@@ -837,7 +823,7 @@ public partial class AssignmentGenerator : BaseGenerator
         if (valueObj is String s)
         {
             if (Int32.TryParse(s, out var result)) return result;
-            else throw new AssignmentExpressionException("Int(value)", $"Could not convert '{valueObj}' to an integer.");
+            else throw new AssignmentExpressionException(FunctionAttribute.GetDefinition(), $"Could not convert '{valueObj}' to an integer.");
         }
 
         return 0;
@@ -846,16 +832,14 @@ public partial class AssignmentGenerator : BaseGenerator
     /// <summary>
     /// Performs an If branch
     /// </summary>
+    [Function("If", "If(condition,then,else)", MinArguments = 3, MaxArguments = 3)]
     private Object? FuncIf(List<Node> nodes)
     {
-        if (nodes.Count != 3)
-            throw new AssignmentExpressionException("If(condition,then,else)", "Expects exactly three arguments.");
+        CheckArity(nodes);
 
-        var cond = Evaluate(nodes[0]);
-        if (cond is not Boolean b)
-            throw new AssignmentExpressionException("If(condition, then, else)", "Condition must be a boolean.");
+        var cond = EvalAs<Boolean>(nodes, 0);
 
-        return b ? Evaluate(nodes[1]) : Evaluate(nodes[2]);
+        return cond ? Evaluate(nodes[1]) : Evaluate(nodes[2]);
     }
     #endregion
 
@@ -863,30 +847,21 @@ public partial class AssignmentGenerator : BaseGenerator
     /// <summary>
     /// Converts the provided string to lower case
     /// </summary>
+    [Function("Lower", "Lower(string)", MinArguments = 1, MaxArguments = 1)]
     private String FuncLower(List<Node> nodes)
     {
-        if (nodes.Count != 1)
-            throw new AssignmentExpressionException("Lower(s)", "Requires one argument.");
-
-        var value = Evaluate(nodes[0]);
-
-        if (value is not String s)
-            throw new AssignmentExpressionException("Lower(s)", "Expects a string.");
-
-        return TextInfo.ToLower(s);
+        CheckArity(nodes);
+        return TextInfo.ToLower(EvalAs<String>(nodes, 0));
     }
 
+    /// <summary>
+    /// Converts the string to plural
+    /// </summary>
+    [Function("Plural", "Plural(string)", MinArguments = 1, MaxArguments = 1)]
     private String FuncPlural(List<Node> nodes)
     {
-        if (nodes.Count != 1)
-            throw new AssignmentExpressionException("Plural(string)", "Requires exactly one argument.");
-
-        var value = Evaluate(nodes[0]);
-
-        if (value is not String s)
-            throw new AssignmentExpressionException("Plural(string)", "Expects a string.");
-
-        return Pluralizer.Pluralize(s);
+        CheckArity(nodes);
+        return Pluralizer.Pluralize(EvalAs<String>(nodes, 0));
     }
 
     [GeneratedRegex("[?.!]\\s+[a-z]")]
@@ -895,70 +870,79 @@ public partial class AssignmentGenerator : BaseGenerator
     /// <summary>
     /// Converts the provided string to sentence case
     /// </summary>
+    [Function("Sentence", "Sentence(string)", MinArguments = 1, MaxArguments = 1)]
     private String FuncSentence(List<Node> nodes)
     {
-        if (nodes.Count != 1)
-            throw new AssignmentExpressionException("Sentence(s)", "Requires exactly one argument.");
+        CheckArity(nodes);
 
-        var value = Evaluate(nodes[0]);
-
-        if (value is not String s)
-            throw new AssignmentExpressionException("Sentence(s)", "Expects a string.");
-
-        s = TextInfo.ToUpper(s[0]) + s[1..];
+        var value = EvalAs<String>(nodes, 0);
         var r = SentenceRegex();
-        s = r.Replace(s, m => m.Value.ToUpper());
+        value = TextInfo.ToUpper(value[0]) + value[1..];
+        value = r.Replace(value, m => m.Value.ToUpper());
 
-        return s;
+        return value;
     }
 
+    /// <summary>
+    /// Converts the string to singluar
+    /// </summary>
+    [Function("Singular", "Singular(string)", MinArguments = 1, MaxArguments = 1)]
     private String FuncSingular(List<Node> nodes)
     {
-        if (nodes.Count != 1)
-            throw new AssignmentExpressionException("Plural(string)", "Requires exactly one argument.");
-
-        var value = Evaluate(nodes[0]);
-
-        if (value is not String s)
-            throw new AssignmentExpressionException("Plural(string)", "Expects a string.");
-
-        return Pluralizer.Singularize(s);
+        CheckArity(nodes);
+        return Pluralizer.Singularize(EvalAs<String>(nodes, 0));
     }
 
     /// <summary>
     /// Converts the string to title case
     /// </summary>
+    [Function("Title", "Title(string)", MinArguments = 1, MaxArguments = 1)]
     private String FuncTitle(List<Node> nodes)
     {
-        if (nodes.Count != 1)
-            throw new AssignmentExpressionException("Title(s)", "Requires exactly one argument.");
-
-        var value = Evaluate(nodes[0]);
-
-        if (value is not String s)
-            throw new AssignmentExpressionException("Title(s)", "Expects a string.");
-
-        return TextInfo.ToTitleCase(s);
+        CheckArity(nodes);
+        var words = TextInfo.ToTitleCase(EvalAs<String>(nodes, 0)).Split(' ');
+        for(var i = 1; i < words.Length; i++)
+        {
+            var word = words[i];
+            if (word.In(StringComparer.InvariantCultureIgnoreCase,
+                        "the", "a", "an",
+                        "and", "or", "but",
+                        "at", "by", "to", "of", "in", "on"))
+                words[i] = word.ToLowerInvariant();
+        }
+        return String.Join(' ', words);
     }
 
     /// <summary>
     /// Converts the string to upper case
     /// </summary>
+    [Function("Upper", "Upper(string)", MinArguments = 1, MaxArguments = 1)]
     private String FuncUpper(List<Node> nodes)
     {
-        if (nodes.Count != 1)
-            throw new AssignmentExpressionException("Upper(s)", "Requires exactly one argument.");
-
-        var value = Evaluate(nodes[0]);
-
-        if (value is not String s)
-            throw new AssignmentExpressionException("Upper(s)", "Expects a string.");
-
-        return TextInfo.ToUpper(s);
-    } 
+        CheckArity(nodes);
+        return TextInfo.ToUpper(EvalAs<String>(nodes, 0));
+    }
     #endregion
 
+    /// <summary>
+    /// Converts CP to the greatest possible integer coin
+    /// </summary>
+    [Function("FormatCP", "FormatCP(integer)", MinArguments = 1, MaxArguments = 2)]
+    private String FuncFormatCP(List<Node> nodes)
+    {
+        CheckArity(nodes);
+        
+        var cp = EvalAs<Int32>(nodes, 0);
+        var maxCoin = nodes.Count == 1 ? "pp" : EvalAs<String>(nodes, 1);
+
+        if (maxCoin == "pp" && cp % 1000 == 0 && cp > 100000) return $"{cp / 1000:#,#00} pp";
+        if (maxCoin.In("pp","gp") && cp % 100 == 0) return $"{cp / 100:#,#00} gp";
+        if (maxCoin.In("PP","gp","sp") && cp % 10 == 0) return $"{cp / 10} sp";
+        return $"{cp} cp";
+    }
+
     #endregion
+
     /// <summary>
     /// Attempts to retrieve the value of the named variable
     /// </summary>
@@ -975,8 +959,8 @@ public partial class AssignmentGenerator : BaseGenerator
         if (!LineItems.TryGetValue(name, out var list))
             throw new KeyNotFoundException($"Item list '{name}' was not found.");
 
-        if (list is null || list.Count == 0)
-            throw new AssignmentExpressionException($"Item list '{name}' contains no items.");
+        //if (list is null || list.Count == 0)
+        //    throw new AssignmentExpressionException($"Item list '{name}' contains no items.");
 
         return list;
     }
@@ -1053,5 +1037,70 @@ public partial class AssignmentGenerator : BaseGenerator
     private static String UnescapeBrackets(String value) => value.Replace(@"\[", "[").Replace(@"\]", "]");
     private static String FormatVar(Object? v) => $"{v?.GetType()} ({v ?? "null"})";
     #endregion
+    #endregion
+
+    #region Validation Helpers
+    private static void CheckArity(List<Node> nodes, [CallerMemberName] String name = "")
+    {
+        var (min, max) = FunctionAttribute.GetArity(name);
+        if (nodes.Count < min || nodes.Count > max)
+            throw new AssignmentExpressionException(name, $"Expects {DescribeArityError(min, max)} arguments.");
+    }
+
+    private static String DescribeArityError(Int32 min, Int32 max)
+    {
+        if (min == 0 && max == 0)
+            return "no";
+        if (min == max)
+            return $"exactly {min}";
+        if (max == Int32.MaxValue)
+            return $"at least {min}";
+        return $"between {min} and {max}";
+    }
+
+    private Object? EvalArgument(String name, List<Node> nodes, Int32 index)
+    {
+        if (index >= nodes.Count)
+            throw new AssignmentExpressionException(name, $"Missing argument {index + 1}.");
+        return Evaluate(nodes[index]);
+    }
+
+    private T EvalAs<T>(List<Node> nodes, Int32 index, [CallerMemberName] String name = "")
+    {
+        name = FunctionAttribute.GetDefinition(name);
+        return EvalAs<T>(nodes, index, false, name)!;
+    }
+
+    private T? EvalAs<T>(List<Node> nodes, Int32 index, Boolean allowNull, [CallerMemberName] String name = "")
+    {
+        var v = EvalArgument(name, nodes, index);
+        if (v == null && allowNull) return default;
+        if (v == null) throw new AssignmentExpressionException(name, $"Argument {index + 1} cannot be null");
+        if (v is not T t)
+            throw new AssignmentExpressionException(name, $"Argument {index + 1} expects a {typeof(T)} got {v.GetType()}");
+        return t;
+    }
+
+    private IEnumerable<T> EvalAllAs<T>(List<Node> nodes, [CallerMemberName] String name = "")
+    {
+        return EvalRangeAs<T>(nodes, 0, nodes.Count - 1, name);            
+    }
+
+    private IEnumerable<T?> EvalAllAs<T>(List<Node> nodes, Boolean allowNull, [CallerMemberName] String name = "")
+    {
+        return EvalRangeAs<T>(nodes, 0, nodes.Count - 1, allowNull, name);
+    }
+
+    private IEnumerable<T> EvalRangeAs<T>(List<Node> nodes, Int32 start, Int32 end, [CallerMemberName] String name = "")
+    {
+        for (var i = start; i <= end; i++)
+            yield return EvalAs<T>(nodes, i, name);
+    }
+
+    private IEnumerable<T?> EvalRangeAs<T>(List<Node> nodes, Int32 start, Int32 end, Boolean allowNull, [CallerMemberName] String name = "")
+    {
+        for(var i = start; i <= end; i++)
+            yield return EvalAs<T>(nodes, i, allowNull, name);
+    }
     #endregion
 }

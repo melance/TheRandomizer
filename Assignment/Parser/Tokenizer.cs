@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using LB.Utility.Extensions;
+using System.Text;
 
 namespace TheRandomizer.Assignment.Parser;
 
@@ -69,6 +70,8 @@ internal sealed class Tokenizer(String expression)
                 return ReadString();
             case ':': // Assignment if followed by =
                 return ReadAssignment();
+            case '-':
+                return ReadNumber();
         }
 
         if (char.IsDigit(c))
@@ -173,16 +176,38 @@ internal sealed class Tokenizer(String expression)
     {
         var position = Index;
         var value = new StringBuilder();
+        var multiplier = 1;
+        Char? coin = null;
 
-        while (!Eof() && Char.IsDigit(Peek()))
-        {
+        if (Peek() == '-')
             value.Append(Next());
+
+        while (!Eof() && (Char.IsDigit(Peek()) || Peek() == '_'))
+        {
+            if (Peek() != '_')
+                value.Append(Next());
+        }
+
+        if (Char.ToLowerInvariant(Peek()).In('c','s','e','g','p') 
+            && Char.ToLowerInvariant(Peek(1)) == 'p')
+        {
+            coin = Next();
+            Next();
+            multiplier = Char.ToLowerInvariant(coin.Value) switch
+            {
+                's' => 10,
+                'e' => 50,
+                'g' => 100,
+                'p' => 1000,
+                _ => 1
+            };
         }
 
         if (!Int32.TryParse(value.ToString(), out Int32 n))
             throw Error($"Invalid number '{value}'.", position);
-
-        return new Token(TokenTypes.Number, value.ToString(), position, n);
+        if (coin != null)
+            value.Append($"{coin}p");
+        return new Token(TokenTypes.Number, value.ToString(), position, n * multiplier);
     }
 
     private Token ReadOneOfOrOr()
