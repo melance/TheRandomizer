@@ -7,9 +7,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\DiceRoller\DiceRoller\DiceRoller.csproj" />
-    <ProjectReference Include="..\..\JsonhCs-main\JsonhCs\JsonhCs.csproj" />
-    <ProjectReference Include="..\..\LB.Utility\LB.Utility.csproj" />
+    <ProjectReference Include="..\..\..\DiceRoller\DiceRoller\DiceRoller.csproj" />
+    <ProjectReference Include="..\..\..\JsonhCs-main\JsonhCs\JsonhCs.csproj" />
+    <ProjectReference Include="..\..\..\LB.Utility\LB.Utility.csproj" />
   </ItemGroup>
 
 </Project>

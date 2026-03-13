@@ -510,22 +510,28 @@ public partial class AssignmentGenerator : BaseGenerator
     {
         CheckArity(nodes);
 
+        if (Dice == null) throw new NullReferenceException("Dice has not been initialized.");
+
         var expression = EvalAs<String>(nodes, 0);
 
-        var dice = new Dice();
         foreach(var variable in Variables)
         {
             if (variable.Value is Int32 i32)
-                dice.Variables[variable.Key] = i32;
+                Dice.Variables[variable.Key] = i32;
             if (variable.Value is Int64 i64)
-                dice.Variables[variable.Key] = i64;
+                Dice.Variables[variable.Key] = i64;
+            if (variable.Value is Decimal d)
+                Dice.Variables[variable.Key] = d;
+            if (variable.Value is Double db)
+                Dice.Variables[variable.Key] = db;
             if (Int32.TryParse(variable.Value?.ToString(), out var i))
-                dice.Variables[variable.Key] = i;
+                Dice.Variables[variable.Key] = i;
             if (Int64.TryParse(variable.Value?.ToString(), out var l))
-                dice.Variables[variable.Key] = l;
+                Dice.Variables[variable.Key] = l;
         }
-        var result = dice.Evaluate(expression);
+        var result = Dice.Evaluate(expression);
         if (result is IntegerValue iResult) return iResult.Value;
+        if (result is DecimalValue dResult) return dResult.Value;
         if (result is BooleanValue bResult) return bResult.Value;
         throw new AssignmentExpressionException($"Invalid type returned from calculation '{expression}' : '{result.GetType().Name}'");
     }
@@ -571,7 +577,7 @@ public partial class AssignmentGenerator : BaseGenerator
             parameters.Add(paramName, paramValue);
         }
 
-        var generator = Deserialize(filePath)
+        var generator = Deserialize(filePath, RNG.Seed)
                         ?? throw new AssignmentExpressionException("Generate(path[,param_name,param_value,...])", $"Unable to load generator, '{filePath}'.");
 
         generator.Parameters = parameters;

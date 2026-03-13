@@ -27,12 +27,14 @@ public abstract class BaseGenerator
         };
     }
 
-    public static BaseGenerator? Deserialize(String filePath) 
+    public static BaseGenerator? Deserialize(String filePath, String? seed = null) 
     {
         var format = ExtensionToFormatType(filePath);
         var text = File.ReadAllText(filePath);
         var definition = Serialization.Deserialize<BaseGenerator>(text, format);
         definition?.FilePath = filePath;
+        definition?.RNG = new PseudoRNG(seed);
+        definition?.Dice = new DiceRoller.Dice(seed, new DiceRoller.EvaluatorOptions() { Flags = DiceRoller.EvaluatorFlags.IncludeDNDCoins });
         return definition;
     }
 
@@ -47,9 +49,10 @@ public abstract class BaseGenerator
     }
     #endregion
 
-    public BaseGenerator() => RNG = PseudoRNG.Initialize();
-    
-    public BaseGenerator(String seed) => RNG = PseudoRNG.Initialize(seed);
+    public BaseGenerator() { }
+
+    #region Members
+    #endregion
 
     #region Properties
     public virtual Version Version { get; set; } = new(1,0);
@@ -61,22 +64,9 @@ public abstract class BaseGenerator
     [JsonIgnore]
     public abstract Boolean SupportsParameters { get; }
     [JsonIgnore]
-    public virtual String FilePath { get; protected set; } = String.Empty;
-    public virtual String? Seed
-    {
-        get => PseudoRNG.Instance?.Seed;
-        set
-        {
-            if (PseudoRNG.Instance?.Seed != value)
-            {
-                if (value == null)
-                    PseudoRNG.Initialize();
-                else
-                    PseudoRNG.Initialize(value);
-            }
-        }
-    }
-    protected virtual PseudoRNG RNG { get; set; }
+    public virtual String FilePath { get; protected set; } = String.Empty;        
+    protected virtual PseudoRNG? RNG { get; set; }    
+    protected virtual DiceRoller.Dice? Dice { get; set; }
     #endregion
 
     #region Public Methods
