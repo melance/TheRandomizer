@@ -1,6 +1,7 @@
 <Solution>
-  <Project Path="../DiceRoller/DiceRoller/DiceRoller.csproj" />
-  <Project Path="../LB.Utility/LB.Utility.csproj" />
+  <Project Path="../../DiceRoller/DiceRoller/DiceRoller.csproj" />
+  <Project Path="../../JsonhCs-main/JsonhCs/JsonhCs.csproj" />
+  <Project Path="../../LB.Utility/LB.Utility.csproj" />
   <Project Path="TheRandomizer.CLI/TheRandomizer.CLI.csproj" Id="3f3f0985-92f7-49b2-80fe-3bf0645f64f0" />
   <Project Path="TheRandomizer.Tests/TheRandomizer.Tests.csproj" Id="13e6c917-fba3-49cb-83b3-503497d17ed9" />
   <Project Path="TheRandomizer/TheRandomizer.csproj" />

@@ -14,7 +14,7 @@ Tables:
 	}
 	Height:
 	{
-		SkipIf: "0"
+		SkipIf: "true"
 		Roll:1d2+Species.AgeMod
 		Content: "
 		| Roll | Result |

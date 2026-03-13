@@ -13,7 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\LB.Utility\LB.Utility.csproj" />
+    <ProjectReference Include="..\..\..\LB.Utility\LB.Utility.csproj" />
     <ProjectReference Include="..\TheRandomizer\TheRandomizer.csproj" />
   </ItemGroup>
 

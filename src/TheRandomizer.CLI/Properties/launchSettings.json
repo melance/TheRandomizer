@@ -14,7 +14,7 @@
     },
     "Table Test": {
       "commandName": "Project",
-      "commandLineArgs": "generate \"C:\\Users\\me_la\\source\\repos\\TheRandomizer\\TheRandomizer.CLI\\TableTest.rgen.jsonh\""
+      "commandLineArgs": "generate \"C:\\Users\\me_la\\source\\repos\\TheRandomizer\\src\\TheRandomizer.CLI\\Test Definitions\\TableTest.rgen.jsonh\""
     }
   }
 }
