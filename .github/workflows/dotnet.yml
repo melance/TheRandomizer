@@ -16,6 +16,18 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+    - name: Checkout LB.Utility
+      uses: actions/checkout@v4
+      with:
+        repository: melance/LB.Utility
+        path: LB.Utility
+        token: ${{secrets.GITHUB_TOKEN}}
+    - name: Checkout DiceRoller
+      uses: actions/checkout@v4
+      with:
+        repository: melance/DiceRoller
+        path: DiceRoller
+        token: ${{secrets.GITHUB_TOKEN}}
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
