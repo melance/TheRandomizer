@@ -124,10 +124,8 @@ internal class Program
         var repeat = Math.Max(result.GetValue(RepeatOption), 1);
         var parameters = result.GetValue(ParameterOption);
         var seed = result.GetValue(SeedOption);
-        var generator = BaseGenerator.Deserialize(fileInfo.FullName) 
+        var generator = BaseGenerator.Deserialize(fileInfo.FullName, seed) 
                         ?? throw new Exception("Error deserializing the file.");
-
-        if (seed != null) generator.Seed = seed;
         // Set the parameters
         if (parameters?.Count > 0)
         {

@@ -80,7 +80,8 @@ internal class TableGenerator : BaseGenerator
         var row = table.Rows.FirstOrDefault(r => r.Range.Contains(roll))
                 ?? throw new DefinitionException($"Table '{name}' has no row matching roll {roll}");
         var result = new InsensitiveDictionary<String?>();
-        for(var i = 0; i < table.Columns.Count; i++)
+        Variables.Add($"{name}.Roll", roll);
+        for (var i = 0; i < table.Columns.Count; i++)
         {
             var column = table.Columns[i];
             var value = row.Cells[i];

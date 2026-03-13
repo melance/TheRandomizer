@@ -3,6 +3,26 @@
   "WorkspaceRootPath": "C:\\Users\\me_la\\source\\repos\\TheRandomizer\\src\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{D53B2AB4-560A-4D62-7AE6-56BFCD076AA3}|TheRandomizer\\TheRandomizer.csproj|c:\\users\\me_la\\source\\repos\\therandomizer\\src\\therandomizer\\table\\tablegenerator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D53B2AB4-560A-4D62-7AE6-56BFCD076AA3}|TheRandomizer\\TheRandomizer.csproj|solutionrelative:therandomizer\\table\\tablegenerator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{3F3F0985-92F7-49B2-80FE-3BF0645F64F0}|TheRandomizer.CLI\\TheRandomizer.CLI.csproj|c:\\users\\me_la\\source\\repos\\therandomizer\\src\\therandomizer.cli\\test definitions\\tabletest.rgen.jsonh||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "RelativeMoniker": "D:0:0:{3F3F0985-92F7-49B2-80FE-3BF0645F64F0}|TheRandomizer.CLI\\TheRandomizer.CLI.csproj|solutionrelative:therandomizer.cli\\test definitions\\tabletest.rgen.jsonh||{8B382828-6202-11D1-8870-0000F87579D2}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{3F3F0985-92F7-49B2-80FE-3BF0645F64F0}|TheRandomizer.CLI\\TheRandomizer.CLI.csproj|c:\\users\\me_la\\source\\repos\\therandomizer\\src\\therandomizer.cli\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{3F3F0985-92F7-49B2-80FE-3BF0645F64F0}|TheRandomizer.CLI\\TheRandomizer.CLI.csproj|solutionrelative:therandomizer.cli\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{3F3F0985-92F7-49B2-80FE-3BF0645F64F0}|TheRandomizer.CLI\\TheRandomizer.CLI.csproj|c:\\users\\me_la\\source\\repos\\therandomizer\\src\\therandomizer.cli\\therandomizer.cli.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{3F3F0985-92F7-49B2-80FE-3BF0645F64F0}|TheRandomizer.CLI\\TheRandomizer.CLI.csproj|solutionrelative:therandomizer.cli\\therandomizer.cli.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D53B2AB4-560A-4D62-7AE6-56BFCD076AA3}|TheRandomizer\\TheRandomizer.csproj|c:\\users\\me_la\\source\\repos\\therandomizer\\src\\therandomizer\\therandomizer.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{D53B2AB4-560A-4D62-7AE6-56BFCD076AA3}|TheRandomizer\\TheRandomizer.csproj|solutionrelative:therandomizer\\therandomizer.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{1092A108-AA1C-5EE1-64D2-EE8681DAAF9F}|..\\..\\DiceRoller\\DiceRoller\\DiceRoller.csproj|c:\\users\\me_la\\source\\repos\\diceroller\\diceroller\\dice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
@@ -10,10 +30,6 @@
     },
     {
       "AbsoluteMoniker": "D:0:0:{1092A108-AA1C-5EE1-64D2-EE8681DAAF9F}|..\\..\\DiceRoller\\DiceRoller\\DiceRoller.csproj|c:\\users\\me_la\\source\\repos\\diceroller\\diceroller\\evaluator\\value.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{3F3F0985-92F7-49B2-80FE-3BF0645F64F0}|TheRandomizer.CLI\\TheRandomizer.CLI.csproj|c:\\users\\me_la\\source\\repos\\therandomizer\\src\\therandomizer.cli\\test definitions\\tabletest.rgen.jsonh||{8B382828-6202-11D1-8870-0000F87579D2}",
-      "RelativeMoniker": "D:0:0:{3F3F0985-92F7-49B2-80FE-3BF0645F64F0}|TheRandomizer.CLI\\TheRandomizer.CLI.csproj|solutionrelative:therandomizer.cli\\test definitions\\tabletest.rgen.jsonh||{8B382828-6202-11D1-8870-0000F87579D2}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{3F3F0985-92F7-49B2-80FE-3BF0645F64F0}|TheRandomizer.CLI\\TheRandomizer.CLI.csproj|c:\\users\\me_la\\source\\repos\\therandomizer\\src\\therandomizer.cli\\therandomizer.cli.csproj||{04B8AB82-A572-4FEF-95CE-5222444B6B64}|",
@@ -27,8 +43,21 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 8,
+          "SelectedChildIndex": 0,
           "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "TableGenerator.cs",
+              "DocumentMoniker": "C:\\Users\\me_la\\source\\repos\\TheRandomizer\\src\\TheRandomizer\\Table\\TableGenerator.cs",
+              "RelativeDocumentMoniker": "TheRandomizer\\Table\\TableGenerator.cs",
+              "ToolTip": "C:\\Users\\me_la\\source\\repos\\TheRandomizer\\src\\TheRandomizer\\Table\\TableGenerator.cs",
+              "RelativeToolTip": "TheRandomizer\\Table\\TableGenerator.cs",
+              "ViewState": "AgIAAEEAAAAAAAAAAAA1wFgAAAA1AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-13T22:00:02.351Z",
+              "EditorCaption": ""
+            },
             {
               "$type": "Bookmark",
               "Name": "ST:128:0:{75188d03-9892-4ae2-abf1-207126247ce5}"
@@ -55,7 +84,46 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 2,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Users\\me_la\\source\\repos\\TheRandomizer\\src\\TheRandomizer.CLI\\Program.cs",
+              "RelativeDocumentMoniker": "TheRandomizer.CLI\\Program.cs",
+              "ToolTip": "C:\\Users\\me_la\\source\\repos\\TheRandomizer\\src\\TheRandomizer.CLI\\Program.cs",
+              "RelativeToolTip": "TheRandomizer.CLI\\Program.cs",
+              "ViewState": "AgIAAHEAAAAAAAAAAAAawHwAAAA6AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-13T21:59:14.446Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "TheRandomizer.CLI",
+              "DocumentMoniker": "C:\\Users\\me_la\\source\\repos\\TheRandomizer\\src\\TheRandomizer.CLI\\TheRandomizer.CLI.csproj",
+              "RelativeDocumentMoniker": "TheRandomizer.CLI\\TheRandomizer.CLI.csproj",
+              "ToolTip": "C:\\Users\\me_la\\source\\repos\\TheRandomizer\\src\\TheRandomizer.CLI\\TheRandomizer.CLI.csproj",
+              "RelativeToolTip": "TheRandomizer.CLI\\TheRandomizer.CLI.csproj",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2026-03-13T21:59:09.662Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "TheRandomizer",
+              "DocumentMoniker": "C:\\Users\\me_la\\source\\repos\\TheRandomizer\\src\\TheRandomizer\\TheRandomizer.csproj",
+              "RelativeDocumentMoniker": "TheRandomizer\\TheRandomizer.csproj",
+              "ToolTip": "C:\\Users\\me_la\\source\\repos\\TheRandomizer\\src\\TheRandomizer\\TheRandomizer.csproj",
+              "RelativeToolTip": "TheRandomizer\\TheRandomizer.csproj",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABIAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2026-03-13T21:38:17.939Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
               "Title": "EvaluatorOptions.cs",
               "DocumentMoniker": "C:\\Users\\me_la\\source\\repos\\DiceRoller\\DiceRoller\\EvaluatorOptions.cs",
               "RelativeDocumentMoniker": "..\\..\\DiceRoller\\DiceRoller\\EvaluatorOptions.cs",
@@ -63,12 +131,11 @@
               "RelativeToolTip": "..\\..\\DiceRoller\\DiceRoller\\EvaluatorOptions.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAABYAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-13T17:24:42.944Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-03-13T17:24:42.944Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 7,
               "Title": "Value.cs",
               "DocumentMoniker": "C:\\Users\\me_la\\source\\repos\\DiceRoller\\DiceRoller\\Evaluator\\Value.cs",
               "RelativeDocumentMoniker": "..\\..\\DiceRoller\\DiceRoller\\Evaluator\\Value.cs",
@@ -76,38 +143,37 @@
               "RelativeToolTip": "..\\..\\DiceRoller\\DiceRoller\\Evaluator\\Value.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAqwA4AAAArAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-13T17:20:28.99Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-03-13T17:20:28.99Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 5,
               "Title": "Dice.cs",
               "DocumentMoniker": "C:\\Users\\me_la\\source\\repos\\DiceRoller\\DiceRoller\\Dice.cs",
               "RelativeDocumentMoniker": "..\\..\\DiceRoller\\DiceRoller\\Dice.cs",
               "ToolTip": "C:\\Users\\me_la\\source\\repos\\DiceRoller\\DiceRoller\\Dice.cs",
               "RelativeToolTip": "..\\..\\DiceRoller\\DiceRoller\\Dice.cs",
-              "ViewState": "AgIAAIQAAAAAAAAAAIA0wJMAAAAYAAAAAAAAAA==",
+              "ViewState": "AgIAAIQAAAAAAAAAAIA0wJQAAAAzAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-03-13T17:15:24.083Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 1,
               "Title": "TableTest.rgen.jsonh",
               "DocumentMoniker": "C:\\Users\\me_la\\source\\repos\\TheRandomizer\\src\\TheRandomizer.CLI\\Test Definitions\\TableTest.rgen.jsonh",
               "RelativeDocumentMoniker": "TheRandomizer.CLI\\Test Definitions\\TableTest.rgen.jsonh",
               "ToolTip": "C:\\Users\\me_la\\source\\repos\\TheRandomizer\\src\\TheRandomizer.CLI\\Test Definitions\\TableTest.rgen.jsonh",
               "RelativeToolTip": "TheRandomizer.CLI\\Test Definitions\\TableTest.rgen.jsonh",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABEAAAAZAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABAAAAAcAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
               "WhenOpened": "2026-03-13T17:15:48.214Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 8,
               "Title": "TheRandomizer.CLI",
               "DocumentMoniker": "C:\\Users\\me_la\\source\\repos\\TheRandomizer\\src\\TheRandomizer.CLI\\TheRandomizer.CLI.csproj",
               "RelativeDocumentMoniker": "TheRandomizer.CLI\\TheRandomizer.CLI.csproj",
