@@ -1,0 +1,20 @@
+{
+  "profiles": {
+    "TheRandomizer.CLI": {
+      "commandName": "Project",
+      "commandLineArgs": "generate \"C:\\Users\\me_la\\source\\repos\\Ærethia2\\Ærethia2\\wwwroot\\data\\randomizer\\npc.rgen.jsonh\""
+    },
+    "View Help": {
+      "commandName": "Project",
+      "commandLineArgs": "generate --help"
+    },
+    "Assignment Test": {
+      "commandName": "Project",
+      "commandLineArgs": "generate \"C:\\Users\\me_la\\source\\repos\\TheRandomizer\\TheRandomizer.CLI\\AssignmentTest.rgen.jsonh\""
+    },
+    "Table Test": {
+      "commandName": "Project",
+      "commandLineArgs": "generate \"C:\\Users\\me_la\\source\\repos\\TheRandomizer\\TheRandomizer.CLI\\TableTest.rgen.jsonh\""
+    }
+  }
+}

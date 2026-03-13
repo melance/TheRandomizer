@@ -1,0 +1,29 @@
+﻿Type: Table
+Name: Table Generator Test
+Tables:
+{
+	Species:
+	{
+		Roll: 1d4
+		Content: "
+		| Roll | Result | AgeMod |
+		| 1	   | Human  | 1 |
+		| 2    | Elf    | 2 |
+		| 3-4  | Dwarf  | 3 |
+		"
+	}
+	Height:
+	{
+		SkipIf: "0"
+		Roll:1d2+Species.AgeMod
+		Content: "
+		| Roll | Result |
+		| 1    | Never  |
+		| 2-6  | Always |
+
+		"
+	}
+}
+Output: "[Species.Result] [Species.Roll] [Species.AgeMod]
+
+[Height.Result]"

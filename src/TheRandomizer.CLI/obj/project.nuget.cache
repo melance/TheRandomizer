@@ -1,0 +1,20 @@
+{
+  "version": 2,
+  "dgSpecHash": "dk1ogJEd/oY=",
+  "success": true,
+  "projectFilePath": "C:\\Users\\me_la\\source\\repos\\TheRandomizer\\TheRandomizer.CLI\\TheRandomizer.CLI.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\me_la\\.nuget\\packages\\bigreal\\5.7.0\\bigreal.5.7.0.nupkg.sha512",
+    "C:\\Users\\me_la\\.nuget\\packages\\linkdotnet.stringbuilder\\3.4.1\\linkdotnet.stringbuilder.3.4.1.nupkg.sha512",
+    "C:\\Users\\me_la\\.nuget\\packages\\markdig.signed\\0.44.0\\markdig.signed.0.44.0.nupkg.sha512",
+    "C:\\Users\\me_la\\.nuget\\packages\\microsoft.aspnetcore.http.abstractions\\2.3.0\\microsoft.aspnetcore.http.abstractions.2.3.0.nupkg.sha512",
+    "C:\\Users\\me_la\\.nuget\\packages\\microsoft.aspnetcore.http.features\\2.3.0\\microsoft.aspnetcore.http.features.2.3.0.nupkg.sha512",
+    "C:\\Users\\me_la\\.nuget\\packages\\microsoft.aspnetcore.mvc.abstractions\\2.3.9\\microsoft.aspnetcore.mvc.abstractions.2.3.9.nupkg.sha512",
+    "C:\\Users\\me_la\\.nuget\\packages\\microsoft.aspnetcore.routing.abstractions\\2.3.0\\microsoft.aspnetcore.routing.abstractions.2.3.0.nupkg.sha512",
+    "C:\\Users\\me_la\\.nuget\\packages\\microsoft.extensions.primitives\\8.0.0\\microsoft.extensions.primitives.8.0.0.nupkg.sha512",
+    "C:\\Users\\me_la\\.nuget\\packages\\microsoft.net.http.headers\\2.3.8\\microsoft.net.http.headers.2.3.8.nupkg.sha512",
+    "C:\\Users\\me_la\\.nuget\\packages\\resultzero\\3.1.0\\resultzero.3.1.0.nupkg.sha512",
+    "C:\\Users\\me_la\\.nuget\\packages\\system.commandline\\2.0.3\\system.commandline.2.0.3.nupkg.sha512"
+  ],
+  "logs": []
+}

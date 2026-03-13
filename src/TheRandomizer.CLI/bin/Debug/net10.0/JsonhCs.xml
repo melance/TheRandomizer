@@ -1,0 +1,393 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>JsonhCs</name>
+    </assembly>
+    <members>
+        <member name="T:JsonhCs.JsonhNumberParser">
+            <summary>
+            Methods for parsing JSONH numbers.
+            </summary>
+            <remarks>
+            Unlike <see cref="M:JsonhCs.JsonhReader.ReadElement"/>, minimal validation is done here. Ensure the input is valid.
+            </remarks>
+        </member>
+        <member name="M:JsonhCs.JsonhNumberParser.Parse(System.String)">
+            <summary>
+            Converts a JSONH number to a base-10 real.
+            For example:<br/>
+            Input: <c>+5.2e3.0</c><br/>
+            Output: <c>5200</c>
+            </summary>
+        </member>
+        <member name="M:JsonhCs.JsonhNumberParser.ParseFractionalNumberWithExponent(System.ReadOnlySpan{System.Char},System.ReadOnlySpan{System.Char})">
+            <summary>
+            Converts a fractional number with an exponent (e.g. <c>12.3e4.5</c>) from the given base (e.g. <c>01234567</c>) to a base-10 real.
+            </summary>
+        </member>
+        <member name="M:JsonhCs.JsonhNumberParser.ParseFractionalNumber(System.ReadOnlySpan{System.Char},System.ReadOnlySpan{System.Char})">
+            <summary>
+            Converts a fractional number (e.g. <c>123.45</c>) from the given base (e.g. <c>01234567</c>) to a base-10 real.
+            </summary>
+        </member>
+        <member name="M:JsonhCs.JsonhNumberParser.ParseWholeNumber(System.ReadOnlySpan{System.Char},System.ReadOnlySpan{System.Char})">
+            <summary>
+            Converts a whole number (e.g. <c>12345</c>) from the given base (e.g. <c>01234567</c>) to a base-10 integer.
+            </summary>
+        </member>
+        <member name="T:JsonhCs.JsonhNumberParserBig">
+            <summary>
+            Methods for parsing JSONH numbers.
+            </summary>
+            <remarks>
+            Unlike <see cref="M:JsonhCs.JsonhReader.ReadElement"/>, minimal validation is done here. Ensure the input is valid.
+            </remarks>
+        </member>
+        <member name="M:JsonhCs.JsonhNumberParserBig.Parse(System.String,System.Int32)">
+            <summary>
+            Converts a JSONH number to a base-10 real.
+            For example:<br/>
+            Input: <c>+5.2e3.0</c><br/>
+            Output: <c>5200</c>
+            </summary>
+            <param name="Decimals">Number of decimal places to use when a fractional exponent is given.</param>
+        </member>
+        <member name="M:JsonhCs.JsonhNumberParserBig.ParseFractionalNumberWithExponent(System.ReadOnlySpan{System.Char},System.ReadOnlySpan{System.Char},System.Int32)">
+            <summary>
+            Converts a fractional number with an exponent (e.g. <c>12.3e4.5</c>) from the given base (e.g. <c>01234567</c>) to a base-10 real.
+            </summary>
+        </member>
+        <member name="M:JsonhCs.JsonhNumberParserBig.ParseFractionalNumber(System.ReadOnlySpan{System.Char},System.ReadOnlySpan{System.Char})">
+            <summary>
+            Converts a fractional number (e.g. <c>123.45</c>) from the given base (e.g. <c>01234567</c>) to a base-10 real.
+            </summary>
+        </member>
+        <member name="M:JsonhCs.JsonhNumberParserBig.ParseWholeNumber(System.ReadOnlySpan{System.Char},System.ReadOnlySpan{System.Char})">
+            <summary>
+            Converts a whole number (e.g. <c>12345</c>) from the given base (e.g. <c>01234567</c>) to a base-10 integer.
+            </summary>
+        </member>
+        <member name="T:JsonhCs.JsonhReader">
+            <summary>
+            A reader that reads JSONH tokens from a <see cref="T:System.IO.TextReader"/>.
+            </summary>
+        </member>
+        <member name="P:JsonhCs.JsonhReader.TextReader">
+            <summary>
+            The text reader to read characters from.
+            </summary>
+        </member>
+        <member name="P:JsonhCs.JsonhReader.Options">
+            <summary>
+            The options to use when reading JSONH.
+            </summary>
+        </member>
+        <member name="P:JsonhCs.JsonhReader.CharCounter">
+            <summary>
+            The number of characters read from <see cref="P:JsonhCs.JsonhReader.TextReader"/>.
+            </summary>
+        </member>
+        <member name="P:JsonhCs.JsonhReader.Line">
+            <summary>
+            The current line being read
+            </summary>
+        </member>
+        <member name="P:JsonhCs.JsonhReader.Column">
+            <summary>
+            The current column being read
+            </summary>
+        </member>
+        <member name="P:JsonhCs.JsonhReader.Depth">
+            <summary>
+            The current recursion depth of the reader.
+            </summary>
+        </member>
+        <member name="P:JsonhCs.JsonhReader.ReservedChars">
+            <summary>
+            Characters that cannot be used unescaped in quoteless strings.
+            </summary>
+        </member>
+        <member name="F:JsonhCs.JsonhReader.ReservedCharsV1">
+            <summary>
+            Characters that cannot be used unescaped in quoteless strings in JSONH V1.
+            </summary>
+        </member>
+        <member name="F:JsonhCs.JsonhReader.ReservedCharsV2">
+            <summary>
+            Characters that cannot be used unescaped in quoteless strings in JSONH V2.
+            </summary>
+        </member>
+        <member name="F:JsonhCs.JsonhReader.NewlineChars">
+            <summary>
+            Characters that are considered newlines.
+            </summary>
+        </member>
+        <member name="F:JsonhCs.JsonhReader.UnreferencedCodeMessage">
+            <summary>
+            Warning message for dynamic serialization.
+            </summary>
+        </member>
+        <member name="M:JsonhCs.JsonhReader.#ctor(System.IO.TextReader,System.Nullable{JsonhCs.JsonhReaderOptions})">
+            <summary>
+            Constructs a reader that reads JSONH from a text reader.
+            </summary>
+        </member>
+        <member name="M:JsonhCs.JsonhReader.#ctor(System.IO.Stream,System.Text.Encoding,System.Nullable{JsonhCs.JsonhReaderOptions})">
+            <summary>
+            Constructs a reader that reads JSONH from a stream using a given encoding.
+            </summary>
+        </member>
+        <member name="M:JsonhCs.JsonhReader.#ctor(System.IO.Stream,System.Nullable{JsonhCs.JsonhReaderOptions})">
+            <summary>
+            Constructs a reader that reads JSONH from a stream using the byte-order marks to detect the encoding.
+            </summary>
+        </member>
+        <member name="M:JsonhCs.JsonhReader.#ctor(System.String,System.Nullable{JsonhCs.JsonhReaderOptions})">
+            <summary>
+            Constructs a reader that reads JSONH from a string.
+            </summary>
+        </member>
+        <member name="M:JsonhCs.JsonhReader.Dispose">
+            <summary>
+            Releases all unmanaged resources used by the reader.
+            </summary>
+        </member>
+        <member name="M:JsonhCs.JsonhReader.ParseElement``1(System.IO.TextReader,System.Nullable{JsonhCs.JsonhReaderOptions})">
+            <summary>
+            Parses a single element from a text reader.
+            </summary>
+        </member>
+        <member name="M:JsonhCs.JsonhReader.ParseElement(System.IO.TextReader,System.Nullable{JsonhCs.JsonhReaderOptions})">
+            <inheritdoc cref="M:JsonhCs.JsonhReader.ParseElement``1(System.IO.TextReader,System.Nullable{JsonhCs.JsonhReaderOptions})"/>
+        </member>
+        <member name="M:JsonhCs.JsonhReader.ParseNode(System.IO.TextReader,System.Nullable{JsonhCs.JsonhReaderOptions})">
+            <inheritdoc cref="M:JsonhCs.JsonhReader.ParseElement``1(System.IO.TextReader,System.Nullable{JsonhCs.JsonhReaderOptions})"/>
+        </member>
+        <member name="M:JsonhCs.JsonhReader.ParseElement``1(System.IO.Stream,System.Text.Encoding,System.Nullable{JsonhCs.JsonhReaderOptions})">
+            <summary>
+            Parses a single element from a stream using a given encoding.
+            </summary>
+        </member>
+        <member name="M:JsonhCs.JsonhReader.ParseElement(System.IO.Stream,System.Text.Encoding,System.Nullable{JsonhCs.JsonhReaderOptions})">
+            <inheritdoc cref="M:JsonhCs.JsonhReader.ParseElement``1(System.IO.Stream,System.Text.Encoding,System.Nullable{JsonhCs.JsonhReaderOptions})"/>
+        </member>
+        <member name="M:JsonhCs.JsonhReader.ParseNode(System.IO.Stream,System.Text.Encoding,System.Nullable{JsonhCs.JsonhReaderOptions})">
+            <inheritdoc cref="M:JsonhCs.JsonhReader.ParseElement``1(System.IO.Stream,System.Text.Encoding,System.Nullable{JsonhCs.JsonhReaderOptions})"/>
+        </member>
+        <member name="M:JsonhCs.JsonhReader.ParseElement``1(System.IO.Stream,System.Nullable{JsonhCs.JsonhReaderOptions})">
+            <summary>
+            Parses a single element from a stream using the byte-order marks to detect the encoding.
+            </summary>
+        </member>
+        <member name="M:JsonhCs.JsonhReader.ParseElement(System.IO.Stream,System.Nullable{JsonhCs.JsonhReaderOptions})">
+            <inheritdoc cref="M:JsonhCs.JsonhReader.ParseElement``1(System.IO.Stream,System.Nullable{JsonhCs.JsonhReaderOptions})"/>
+        </member>
+        <member name="M:JsonhCs.JsonhReader.ParseNode(System.IO.Stream,System.Nullable{JsonhCs.JsonhReaderOptions})">
+            <inheritdoc cref="M:JsonhCs.JsonhReader.ParseElement``1(System.IO.Stream,System.Nullable{JsonhCs.JsonhReaderOptions})"/>
+        </member>
+        <member name="M:JsonhCs.JsonhReader.ParseElement``1(System.String,System.Nullable{JsonhCs.JsonhReaderOptions})">
+            <summary>
+            Parses a single element from a string.
+            </summary>
+        </member>
+        <member name="M:JsonhCs.JsonhReader.ParseElement(System.String,System.Nullable{JsonhCs.JsonhReaderOptions})">
+            <inheritdoc cref="M:JsonhCs.JsonhReader.ParseElement``1(System.String,System.Nullable{JsonhCs.JsonhReaderOptions})"/>
+        </member>
+        <member name="M:JsonhCs.JsonhReader.ParseNode(System.String,System.Nullable{JsonhCs.JsonhReaderOptions})">
+            <inheritdoc cref="M:JsonhCs.JsonhReader.ParseElement``1(System.String,System.Nullable{JsonhCs.JsonhReaderOptions})"/>
+        </member>
+        <member name="M:JsonhCs.JsonhReader.ParseElement``1">
+            <summary>
+            Parses a single element from the reader.
+            </summary>
+        </member>
+        <member name="M:JsonhCs.JsonhReader.ParseElement">
+            <inheritdoc cref="M:JsonhCs.JsonhReader.ParseElement``1"/>
+        </member>
+        <member name="M:JsonhCs.JsonhReader.ParseNode">
+            <summary>
+            Parses a single <see cref="T:System.Text.Json.Nodes.JsonNode"/> from the reader.
+            </summary>
+        </member>
+        <member name="M:JsonhCs.JsonhReader.ParseJson(System.Boolean,System.String)">
+            <summary>
+            Parses a single element as JSON from the reader.<br/><br/>
+            If <paramref name="IncludeComments"/> is true, comments are included (<c>/*</c> and <c>*/</c> are escaped as <c>/ *</c> and <c>* /</c>).<br/>
+            If <paramref name="Indent"/> is not null, the output is pretty-printed with the given indentation.<br/><br/>
+            The result is not safe to embed in HTML.
+            </summary>
+        </member>
+        <member name="M:JsonhCs.JsonhReader.FindPropertyValue(System.String)">
+            <summary>
+            Tries to find the given property name in the reader.<br/>
+            For example, to find <c>c</c>:
+            <code>
+            // Original position
+            {
+              "a": "1",
+              "b": {
+                "c": "2"
+              },
+              "c":/* Final position */ "3"
+            }
+            </code>
+            </summary>
+        </member>
+        <member name="M:JsonhCs.JsonhReader.HasToken">
+            <summary>
+            Reads whitespace and returns whether the reader contains another token.
+            </summary>
+        </member>
+        <member name="M:JsonhCs.JsonhReader.ReadEndOfElements">
+            <summary>
+            Reads comments and whitespace and errors if the reader contains another element.
+            </summary>
+        </member>
+        <member name="M:JsonhCs.JsonhReader.ReadElement">
+            <summary>
+            Reads a single element from the reader.
+            </summary>
+        </member>
+        <member name="P:JsonhCs.JsonhReader.MiniJson">
+            <summary>
+            A preset for reading and writing JSON with minimal formatting.<br/>
+            <list type="bullet">
+            <item>Allows reading numbers from strings</item>
+            <item>Allows named floating point literals</item>
+            <item>Allows trailing commas</item>
+            <item>Always writes newlines as <c>\n</c></item>
+            <item>Allows but skips comments</item>
+            <item>Uses relaxed JSON escaping</item>
+            </list>
+            </summary>
+        </member>
+        <member name="P:JsonhCs.JsonhReader.PrettyJson">
+            <summary>
+            A preset for reading and writing JSON with indented formatting.<br/>
+            <list type="bullet">
+            <item>Allows reading numbers from strings</item>
+            <item>Allows named floating point literals</item>
+            <item>Allows trailing commas</item>
+            <item>Always writes newlines as <c>\n</c></item>
+            <item>Allows but skips comments</item>
+            <item>Uses relaxed JSON escaping</item>
+            <item>Writes indents as tabs</item>
+            </list>
+            </summary>
+        </member>
+        <member name="T:JsonhCs.JsonhReaderOptions">
+            <summary>
+            Options for a <see cref="T:JsonhCs.JsonhReader"/>.
+            </summary>
+        </member>
+        <member name="M:JsonhCs.JsonhReaderOptions.#ctor">
+            <summary>
+            Options for a <see cref="T:JsonhCs.JsonhReader"/>.
+            </summary>
+        </member>
+        <member name="P:JsonhCs.JsonhReaderOptions.Version">
+            <summary>
+            Specifies the major version of the JSONH specification to use.
+            </summary>
+        </member>
+        <member name="P:JsonhCs.JsonhReaderOptions.ParseSingleElement">
+            <summary>
+            Enables/disables checks for exactly one element when parsing.
+            <code>
+            "cat"
+            "dog" // Error: Expected single element
+            </code>
+            </summary>
+            <remarks>
+            This option does not apply when reading elements, only when parsing elements.
+            </remarks>
+        </member>
+        <member name="P:JsonhCs.JsonhReaderOptions.MaxDepth">
+            <summary>
+            Sets the maximum recursion depth allowed when reading JSONH.
+            <code>
+            // Max depth: 2
+            {
+              a: {
+                b: {
+                  // Error: Exceeded max depth
+                }
+              }
+            }
+            </code>
+            </summary>
+            <remarks>
+            The default value is 64 to defend against DOS attacks.
+            </remarks>
+        </member>
+        <member name="P:JsonhCs.JsonhReaderOptions.IncompleteInputs">
+            <summary>
+            Enables/disables parsing unclosed inputs.
+            <code>
+            {
+              "key": "val
+            </code>
+            </summary>
+            <remarks>
+            This is potentially useful for large language models that stream responses.<br/>
+            Only some tokens can be incomplete in this mode, so it should not be relied upon.
+            </remarks>
+        </member>
+        <member name="P:JsonhCs.JsonhReaderOptions.BigNumbers">
+            <summary>
+            Enables/disables parsing of numbers outside the range/precision of a double-precision float.
+            <code>
+            1e99999 // parsed as exact number instead of infinity
+            </code>
+            </summary>
+            <remarks>
+            Numbers will be parsed as <see cref="T:ExtendedNumerics.BigReal"/> instead of <see cref="T:System.Double"/>.
+            </remarks>
+        </member>
+        <member name="M:JsonhCs.JsonhReaderOptions.SupportsVersion(JsonhCs.JsonhVersion)">
+            <summary>
+            Returns whether <see cref="P:JsonhCs.JsonhReaderOptions.Version"/> is greater than or equal to <paramref name="MinimumVersion"/>.
+            </summary>
+        </member>
+        <member name="T:JsonhCs.JsonhToken">
+            <summary>
+            A single JSONH token.
+            </summary>
+        </member>
+        <member name="M:JsonhCs.JsonhToken.#ctor(System.Text.Json.JsonTokenType,System.String)">
+            <summary>
+            A single JSONH token.
+            </summary>
+        </member>
+        <member name="P:JsonhCs.JsonhToken.JsonType">
+            <summary>
+            The type of the token.
+            </summary>
+        </member>
+        <member name="P:JsonhCs.JsonhToken.Value">
+            <summary>
+            The value of the token, or an empty string.
+            </summary>
+        </member>
+        <member name="T:JsonhCs.JsonhVersion">
+            <summary>
+            The major versions of the JSONH specification.
+            </summary>
+        </member>
+        <member name="F:JsonhCs.JsonhVersion.Latest">
+            <summary>
+            Indicates that the latest version should be used (currently <see cref="F:JsonhCs.JsonhVersion.V2"/>).
+            </summary>
+        </member>
+        <member name="F:JsonhCs.JsonhVersion.V1">
+            <summary>
+            Version 1 of the specification, released 2025/03/19.
+            </summary>
+        </member>
+        <member name="F:JsonhCs.JsonhVersion.V2">
+            <summary>
+            Version 2 of the specification, released 2025/11/19.
+            </summary>
+        </member>
+    </members>
+</doc>

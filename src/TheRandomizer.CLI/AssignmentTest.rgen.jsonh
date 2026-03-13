@@ -1,0 +1,27 @@
+﻿Type: Assignment
+Name: Assignment Generator Test
+Libraries:
+[
+	"AssignmentTest.rlib.jsonh"
+]
+LineItems:
+{
+	Start: 
+	[
+		"[repeat(Group1,Random(1,6),' ')]"
+	]
+	Group1:
+	[
+		"123"
+		"456"
+	]
+	Group2:
+	[
+		"Hello"
+		"World"
+	]
+	Group.3:
+	[
+		Goodbye world
+	]
+}
