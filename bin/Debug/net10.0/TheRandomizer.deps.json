@@ -9,7 +9,7 @@
       "TheRandomizer/1.0.0": {
         "dependencies": {
           "DiceRoller": "1.0.0",
-          "JsonhCs": "6.5.0",
+          "JsonhCs": "7.0.0",
           "LB.Utility": "1.0.0"
         },
         "runtime": {
@@ -24,19 +24,6 @@
           "lib/net10.0/BigReal.dll": {
             "assemblyVersion": "5.7.0.0",
             "fileVersion": "5.7.0.0"
-          }
-        }
-      },
-      "JsonhCs/6.5.0": {
-        "dependencies": {
-          "BigReal": "5.7.0",
-          "LinkDotNet.StringBuilder": "3.4.1",
-          "ResultZero": "3.1.0"
-        },
-        "runtime": {
-          "lib/net10.0/JsonhCs.dll": {
-            "assemblyVersion": "6.5.0.0",
-            "fileVersion": "6.5.0.0"
           }
         }
       },
@@ -139,6 +126,19 @@
           }
         }
       },
+      "JsonhCs/7.0.0": {
+        "dependencies": {
+          "BigReal": "5.7.0",
+          "LinkDotNet.StringBuilder": "3.4.1",
+          "ResultZero": "3.1.0"
+        },
+        "runtime": {
+          "JsonhCs.dll": {
+            "assemblyVersion": "7.0.0.0",
+            "fileVersion": "7.0.0.0"
+          }
+        }
+      },
       "LB.Utility/1.0.0": {
         "dependencies": {
           "Markdig.Signed": "0.44.0",
@@ -165,13 +165,6 @@
       "sha512": "sha512-o+ICb498p09o+dHOg33OKyKf3B9qISm4yi/sriwAIglEnD9R1GOmHP3GGBpL33tfYbjpP60NcRBS4kOHoHbrCQ==",
       "path": "bigreal/5.7.0",
       "hashPath": "bigreal.5.7.0.nupkg.sha512"
-    },
-    "JsonhCs/6.5.0": {
-      "type": "package",
-      "serviceable": true,
-      "sha512": "sha512-9VfZkRacMYFmF5lDTquPtuenEoY0HXQ6SJyle3zesbcgZ6z35VBbQDgGFKzbYw9wwseFpoNhdT5DOq4gPR662A==",
-      "path": "jsonhcs/6.5.0",
-      "hashPath": "jsonhcs.6.5.0.nupkg.sha512"
     },
     "LinkDotNet.StringBuilder/3.4.1": {
       "type": "package",
@@ -237,6 +230,11 @@
       "hashPath": "resultzero.3.1.0.nupkg.sha512"
     },
     "DiceRoller/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "JsonhCs/7.0.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

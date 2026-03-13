@@ -1,4 +1,5 @@
 ﻿using DiceRoller;
+using DiceRoller.Evaluator;
 using LB.Utility.Collections;
 using LB.Utility.Extensions;
 using LB.Utility.Random;
@@ -7,6 +8,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 using TheRandomizer.Assignment.Parser;
 using TheRandomizer.Parameters;
@@ -14,14 +16,13 @@ using TheRandomizer.Pluralize;
 using TheRandomizer.Utility;
 
 // ToDo: Potential upgrades
-// Deterministic RNG injection (for unit tests)
 // Precompiled AST caching for performance
 
 namespace TheRandomizer.Assignment;
 
 public partial class AssignmentGenerator : BaseGenerator
 {
-    private static Dictionary<String, Func<List<Node>, Object?>>? _functions;
+    private readonly Dictionary<String, Func<List<Node>, Object?>>? _functions;
 
     private static Dictionary<String, Func<List<Node>, Object?>> BuildFunctionRegistry(AssignmentGenerator target)
     {
@@ -56,6 +57,8 @@ public partial class AssignmentGenerator : BaseGenerator
     #endregion
 
     #region Constants
+    /// <summary>The preprocess line item</summary>
+    private const String PRE_PROCESS_ITEM = "PreProcess";
     /// <summary>The starting lineitem for generation</summary>
     private const String START_ITEM = "Start";
     /// <summary>The maximum level of recursion to allow before aborting the generation process</summary>
@@ -66,10 +69,13 @@ public partial class AssignmentGenerator : BaseGenerator
 
     #region Public Properties
     public static TextInfo TextInfo => CultureInfo.CurrentCulture.TextInfo;
+    [JsonIgnore]
     public override Boolean SupportsParameters => true;
     public Boolean RemoveEmptyLines { get; set; }
     public LineItemDictionary LineItems { get; set; } = [];
     public List<String> Libraries { get; set; } = [];
+    [JsonIgnore]
+    public Func<String, List<Object>, Object?>? FunctionHandler { get; set; }
     #endregion
 
     #region Private Properties
@@ -89,6 +95,9 @@ public partial class AssignmentGenerator : BaseGenerator
         LoadLibraries();
         if (!PreProcessParameters())
             throw new ParameterValidationException(Parameters.ErrorList);
+
+        if (LineItems.ContainsKey(PRE_PROCESS_ITEM))
+            PreProcess();
 
         var startItem = SelectLineItem(START_ITEM) 
                         ?? throw new Exception("Start list is empty");
@@ -130,6 +139,14 @@ public partial class AssignmentGenerator : BaseGenerator
     #endregion
 
     #region Private Methods
+    private void PreProcess()
+    {
+        foreach(var lineItem in LineItems[PRE_PROCESS_ITEM])
+        {
+            Render(lineItem.Content);
+        }
+    }
+
     private Boolean PreProcessParameters()
     {
         var valid = true;
@@ -199,12 +216,12 @@ public partial class AssignmentGenerator : BaseGenerator
         return SelectFromList(list);
     }
 
-    private static LineItem? SelectFromList(LineItemList list)
+    private LineItem? SelectFromList(LineItemList list)
     {
         if (list.Count == 0) return null;
         var totalWeight = (UInt32)list.Sum(i => Math.Max(i.Weight, 1));
 
-        var roll = PseudoRNG.Instance?.NextUInt32(totalWeight);
+        var roll = RNG.NextUInt32(totalWeight);
         var sum = 0;
 
         foreach(var item in list)
@@ -349,14 +366,26 @@ public partial class AssignmentGenerator : BaseGenerator
     {
         var value = Evaluate(n);
         if (value is Boolean b) return b;
-        throw new AssignmentExpressionException($"Excpected Boolean. Got {value?.GetType()} : {(value ?? "null")}");
+        throw new AssignmentExpressionException($"Expected Boolean. Got {value?.GetType()} : {(value ?? "null")}");
     }
 
     private Object? EvalCall(CallNode node)
     {
         if (!_functions!.TryGetValue(node.Name, out var function))
-            throw new AssignmentExpressionException($"Unknown function '{node.Name}'.");
-        return function.Invoke(node.Arguments);
+        {
+            if (FunctionHandler == null)
+                throw new AssignmentExpressionException($"Unknown function '{node.Name}'.");
+            else
+            {
+                var parameters = new List<Object>();
+                foreach (var argument in node.Arguments)
+                {
+                    parameters.Add(Evaluate(argument) ?? throw new AssignmentExpressionException("EvalCall", "Parameter cannot be null"));
+                }
+                return FunctionHandler.Invoke(node.Name, parameters);
+            }
+        }
+        return function!.Invoke(node.Arguments);
     }
 
     /// <summary>
@@ -477,7 +506,7 @@ public partial class AssignmentGenerator : BaseGenerator
     /// Evaluates the provided Dice Roller expression
     /// </summary>
     [Function("Calc", "Calc(formula)", MinArguments = 1, MaxArguments = 1)]
-    private Int32 FuncCalc(List<Node> nodes)
+    private Object FuncCalc(List<Node> nodes)
     {
         CheckArity(nodes);
 
@@ -490,8 +519,31 @@ public partial class AssignmentGenerator : BaseGenerator
                 dice.Variables[variable.Key] = i32;
             if (variable.Value is Int64 i64)
                 dice.Variables[variable.Key] = i64;
+            if (Int32.TryParse(variable.Value?.ToString(), out var i))
+                dice.Variables[variable.Key] = i;
+            if (Int64.TryParse(variable.Value?.ToString(), out var l))
+                dice.Variables[variable.Key] = l;
         }
-        return (Int32)dice.Roll(expression);
+        var result = dice.Evaluate(expression);
+        if (result is IntegerValue iResult) return iResult.Value;
+        if (result is BooleanValue bResult) return bResult.Value;
+        throw new AssignmentExpressionException($"Invalid type returned from calculation '{expression}' : '{result.GetType().Name}'");
+    }
+
+    [Function("ListExists", "ListExists(string)", MinArguments = 1, MaxArguments = 1)]
+    private Boolean FuncListExists(List<Node> nodes)
+    {
+        CheckArity(nodes);
+        var name = EvalAs<String>(nodes, 0);
+        return LineItems.ContainsKey(name);
+    }
+
+    [Function("VarExists", "VarExists(string)", MinArguments = 1, MaxArguments = 1)]
+    private Boolean FuncVarExists(List<Node> nodes)
+    {
+        CheckArity(nodes);
+        var name = EvalAs<String>(nodes, 0);
+        return Variables.ContainsKey(name);
     }
 
     /// <summary>
@@ -576,7 +628,7 @@ public partial class AssignmentGenerator : BaseGenerator
             values.Add(value);
         }
 
-        return values[(Int32)(PseudoRNG.Instance?.NextUInt32((UInt32)values.Count) ?? 0)];
+        return values[(Int32)(RNG.NextUInt32((UInt32)values.Count))];
     }
 
     [Function("Random", "Random([min, ] max)", MinArguments = 1)]
@@ -587,7 +639,7 @@ public partial class AssignmentGenerator : BaseGenerator
         var min = nodes.Count == 1 ? 0 : EvalAs<Int32>(nodes, 0);
         var max = nodes.Count == 1 ? EvalAs<Int32>(nodes, 0) : EvalAs<Int32>(nodes, 1);
 
-        return PseudoRNG.Instance!.NextInt32(min, max);
+        return RNG.NextInt32(min, max);
     }
 
     /// <summary>
@@ -667,6 +719,24 @@ public partial class AssignmentGenerator : BaseGenerator
         return value[range];
     }
 
+    [Function("Switch","Switch(value, case, result, [case, result,] default)", MinArguments = 4)]
+    private Object? FuncSwitch(List<Node> nodes)
+    {
+        CheckArity(nodes);
+        if (nodes.Count.IsOdd()) throw new AssignmentExpressionException(FunctionAttribute.GetName(nameof(FuncSwitch)), "Expects an even number of arguments.");
+
+        var value = Evaluate(nodes[0]);
+
+        for(var i = 1; i < nodes.Count; i+=2)
+        {
+            var caseValue = Evaluate(nodes[i]);
+
+            if (ValuesEqual(value, caseValue))
+                return Evaluate(nodes[i + 1]);
+        }
+        return Evaluate(nodes[^1]);
+    }
+
     /// <summary>
     /// Selects the left portion of a string
     /// </summary>
@@ -676,11 +746,13 @@ public partial class AssignmentGenerator : BaseGenerator
         CheckArity(nodes);        
         var value = EvalAs<String>(nodes, 0);
         var length = EvalAs<Int32>(nodes, 1);
+        if (length == 0) return String.Empty;
+        if (length > value.Length) return value;
         return value[length..];
     }
 
     /// <summary>
-    /// Selects the left portion of a string
+    /// Selects the right portion of a string
     /// </summary>
     [Function("Right", "Right(string, length)", MinArguments = 2, MaxArguments = 2)]
     private String FuncRight(List<Node> nodes)
@@ -688,6 +760,8 @@ public partial class AssignmentGenerator : BaseGenerator
         CheckArity(nodes);
         var value = EvalAs<String>(nodes, 0);        
         var length = EvalAs<Int32>(nodes, 1);
+        if (length == 0) return String.Empty;
+        if (length > value.Length) return value;
         return value.Right(length);
     }
 
@@ -812,6 +886,24 @@ public partial class AssignmentGenerator : BaseGenerator
         return false;
     }
 
+    [Function("In","In(value, a[, b, ...])", MinArguments = 2)]
+    private Boolean FuncIn(List<Node> nodes)
+    {
+        CheckArity(nodes);
+
+        var value = Evaluate(nodes[0]);
+
+        if (value == null) return false;
+
+        for(var i = 1; i < nodes.Count; i++)
+        {
+            var comp = Evaluate(nodes[1]);
+            if (value.GetType() != comp?.GetType()) throw new AssignmentExpressionException("In", "All arguments must be of the same type.");
+            if (value.Equals(comp)) return true;
+        }
+        return false;
+    }
+
     [Function("Int", "Int(value)", MinArguments = 1, MaxArguments = 1)]
     private Int32 FuncInt(List<Node> nodes)
     {
@@ -832,14 +924,36 @@ public partial class AssignmentGenerator : BaseGenerator
     /// <summary>
     /// Performs an If branch
     /// </summary>
-    [Function("If", "If(condition,then,else)", MinArguments = 3, MaxArguments = 3)]
+    [Function("If", "If(condition,then,else)", MinArguments = 2, MaxArguments = 3)]
     private Object? FuncIf(List<Node> nodes)
     {
         CheckArity(nodes);
 
         var cond = EvalAs<Boolean>(nodes, 0);
 
-        return cond ? Evaluate(nodes[1]) : Evaluate(nodes[2]);
+        if (nodes.Count == 3)
+            return cond ? Evaluate(nodes[1]) : Evaluate(nodes[2]);
+        else
+            return cond ? Evaluate(nodes[1]) : null;
+    }
+
+    /// <summary>
+    /// If the first list exists, select from it otherwise use the second list
+    /// </summary>
+    /// <param name="nodes"></param>
+    [Function("SelectIf", "SelectIf(ListOne,ListTwo)", MinArguments = 2, MaxArguments = 2)]
+    private String? FuncSelectIf(List<Node> nodes)
+    {
+        CheckArity(nodes);
+
+        var listName1 = EvalAs<String>(nodes, 0);
+
+        if (LineItems.ContainsKey(listName1))
+            return FuncSelect([nodes[0]]);
+        else if (nodes.Count == 2)
+            return FuncSelect([nodes[1]]);
+        else 
+            return null;
     }
     #endregion
 
@@ -876,8 +990,9 @@ public partial class AssignmentGenerator : BaseGenerator
         CheckArity(nodes);
 
         var value = EvalAs<String>(nodes, 0);
+        if (value == String.Empty) return value;
         var r = SentenceRegex();
-        value = TextInfo.ToUpper(value[0]) + value[1..];
+        value = TextInfo.ToUpper(value[0]) + (value.Length > 1 ? value[1..] : "");
         value = r.Replace(value, m => m.Value.ToUpper());
 
         return value;
@@ -924,23 +1039,6 @@ public partial class AssignmentGenerator : BaseGenerator
     }
     #endregion
 
-    /// <summary>
-    /// Converts CP to the greatest possible integer coin
-    /// </summary>
-    [Function("FormatCP", "FormatCP(integer)", MinArguments = 1, MaxArguments = 2)]
-    private String FuncFormatCP(List<Node> nodes)
-    {
-        CheckArity(nodes);
-        
-        var cp = EvalAs<Int32>(nodes, 0);
-        var maxCoin = nodes.Count == 1 ? "pp" : EvalAs<String>(nodes, 1);
-
-        if (maxCoin == "pp" && cp % 1000 == 0 && cp > 100000) return $"{cp / 1000:#,#00} pp";
-        if (maxCoin.In("pp","gp") && cp % 100 == 0) return $"{cp / 100:#,#00} gp";
-        if (maxCoin.In("PP","gp","sp") && cp % 10 == 0) return $"{cp / 10} sp";
-        return $"{cp} cp";
-    }
-
     #endregion
 
     /// <summary>
@@ -958,9 +1056,6 @@ public partial class AssignmentGenerator : BaseGenerator
     {
         if (!LineItems.TryGetValue(name, out var list))
             throw new KeyNotFoundException($"Item list '{name}' was not found.");
-
-        //if (list is null || list.Count == 0)
-        //    throw new AssignmentExpressionException($"Item list '{name}' contains no items.");
 
         return list;
     }
@@ -1036,6 +1131,15 @@ public partial class AssignmentGenerator : BaseGenerator
 
     private static String UnescapeBrackets(String value) => value.Replace(@"\[", "[").Replace(@"\]", "]");
     private static String FormatVar(Object? v) => $"{v?.GetType()} ({v ?? "null"})";
+
+    private static Boolean ValuesEqual(Object? left, Object? right)
+    {
+        if (left is Int32 li && right is Int32 ri) return li == ri;
+        if (left is Boolean lb && right is Boolean rb) return lb == rb;
+        if (left is String ls && right is String rs)
+            return ls.Equals(rs, StringComparison.InvariantCultureIgnoreCase);
+        return false;
+    }
     #endregion
     #endregion
 

@@ -1,6 +1,4 @@
-﻿using LB.Utility.Extensions;
-
-namespace TheRandomizer.Assignment.Parser;
+﻿namespace TheRandomizer.Assignment.Parser;
 
 internal abstract record Node();
 
@@ -222,7 +220,12 @@ internal class Parser
         if (Match(TokenTypes.Number))
             return new NumberNode((Int32)Previous().Value!);
         if (Match(TokenTypes.String))
-            return new StringNode((String)Previous().Value!);
+        {
+            if (Int32.TryParse((String)Previous().Value!, out var i))
+                return new NumberNode(i);
+            else
+                return new StringNode((String)Previous().Value!);
+        }
         if (Match(TokenTypes.Boolean))
             return new BooleanNode((Boolean)Previous().Value!);
         if (Match(TokenTypes.Variable))

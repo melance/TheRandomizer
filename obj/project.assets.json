@@ -18,24 +18,6 @@
           }
         }
       },
-      "JsonhCs/6.5.0": {
-        "type": "package",
-        "dependencies": {
-          "BigReal": "5.7.0",
-          "LinkDotNet.StringBuilder": "3.4.1",
-          "ResultZero": "3.1.0"
-        },
-        "compile": {
-          "lib/net10.0/JsonhCs.dll": {
-            "related": ".xml"
-          }
-        },
-        "runtime": {
-          "lib/net10.0/JsonhCs.dll": {
-            "related": ".xml"
-          }
-        }
-      },
       "LinkDotNet.StringBuilder/3.4.1": {
         "type": "package",
         "compile": {
@@ -185,6 +167,21 @@
           "bin/placeholder/DiceRoller.dll": {}
         }
       },
+      "JsonhCs/7.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v10.0",
+        "dependencies": {
+          "BigReal": "5.7.0",
+          "LinkDotNet.StringBuilder": "3.4.1",
+          "ResultZero": "3.1.0"
+        },
+        "compile": {
+          "bin/placeholder/JsonhCs.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/JsonhCs.dll": {}
+        }
+      },
       "LB.Utility/1.0.0": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v10.0",
@@ -219,25 +216,6 @@
         "lib/net8.0/BigReal.xml",
         "lib/net9.0/BigReal.dll",
         "lib/net9.0/BigReal.xml"
-      ]
-    },
-    "JsonhCs/6.5.0": {
-      "sha512": "9VfZkRacMYFmF5lDTquPtuenEoY0HXQ6SJyle3zesbcgZ6z35VBbQDgGFKzbYw9wwseFpoNhdT5DOq4gPR662A==",
-      "type": "package",
-      "path": "jsonhcs/6.5.0",
-      "files": [
-        ".nupkg.metadata",
-        ".signature.p7s",
-        "IconUpscaledSquare.png",
-        "README.md",
-        "jsonhcs.6.5.0.nupkg.sha512",
-        "jsonhcs.nuspec",
-        "lib/net10.0/JsonhCs.dll",
-        "lib/net10.0/JsonhCs.xml",
-        "lib/net8.0/JsonhCs.dll",
-        "lib/net8.0/JsonhCs.xml",
-        "lib/net9.0/JsonhCs.dll",
-        "lib/net9.0/JsonhCs.xml"
       ]
     },
     "LinkDotNet.StringBuilder/3.4.1": {
@@ -404,6 +382,11 @@
       "path": "../../DiceRoller/DiceRoller/DiceRoller.csproj",
       "msbuildProject": "../../DiceRoller/DiceRoller/DiceRoller.csproj"
     },
+    "JsonhCs/7.0.0": {
+      "type": "project",
+      "path": "../../JsonhCs-main/JsonhCs/JsonhCs.csproj",
+      "msbuildProject": "../../JsonhCs-main/JsonhCs/JsonhCs.csproj"
+    },
     "LB.Utility/1.0.0": {
       "type": "project",
       "path": "../../LB.Utility/LB.Utility.csproj",
@@ -413,7 +396,7 @@
   "projectFileDependencyGroups": {
     "net10.0": [
       "DiceRoller >= 1.0.0",
-      "JsonhCs >= 6.5.0",
+      "JsonhCs >= 7.0.0",
       "LB.Utility >= 1.0.0"
     ]
   },
@@ -453,6 +436,9 @@
             "C:\\Users\\me_la\\source\\repos\\DiceRoller\\DiceRoller\\DiceRoller.csproj": {
               "projectPath": "C:\\Users\\me_la\\source\\repos\\DiceRoller\\DiceRoller\\DiceRoller.csproj"
             },
+            "C:\\Users\\me_la\\source\\repos\\JsonhCs-main\\JsonhCs\\JsonhCs.csproj": {
+              "projectPath": "C:\\Users\\me_la\\source\\repos\\JsonhCs-main\\JsonhCs\\JsonhCs.csproj"
+            },
             "C:\\Users\\me_la\\source\\repos\\LB.Utility\\LB.Utility.csproj": {
               "projectPath": "C:\\Users\\me_la\\source\\repos\\LB.Utility\\LB.Utility.csproj"
             }
@@ -474,12 +460,6 @@
     "frameworks": {
       "net10.0": {
         "targetAlias": "net10.0",
-        "dependencies": {
-          "JsonhCs": {
-            "target": "Package",
-            "version": "[6.5.0, )"
-          }
-        },
         "imports": [
           "net461",
           "net462",

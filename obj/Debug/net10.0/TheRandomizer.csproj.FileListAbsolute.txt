@@ -16,3 +16,6 @@ C:\Users\me_la\source\repos\TheRandomizer\TheRandomizer\obj\Debug\net10.0\refint
 C:\Users\me_la\source\repos\TheRandomizer\TheRandomizer\obj\Debug\net10.0\TheRandomizer.pdb
 C:\Users\me_la\source\repos\TheRandomizer\TheRandomizer\obj\Debug\net10.0\ref\TheRandomizer.dll
 C:\Users\me_la\source\repos\TheRandomizer\TheRandomizer\obj\Debug\net10.0\TheRandomizer.sourcelink.json
+C:\Users\me_la\source\repos\TheRandomizer\TheRandomizer\bin\Debug\net10.0\JsonhCs.dll
+C:\Users\me_la\source\repos\TheRandomizer\TheRandomizer\bin\Debug\net10.0\JsonhCs.pdb
+C:\Users\me_la\source\repos\TheRandomizer\TheRandomizer\bin\Debug\net10.0\JsonhCs.xml

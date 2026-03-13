@@ -1,11 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "ZMt8dlgJRqM=",
+  "dgSpecHash": "glWwPEhKiRQ=",
   "success": true,
   "projectFilePath": "C:\\Users\\me_la\\source\\repos\\TheRandomizer\\TheRandomizer\\TheRandomizer.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\me_la\\.nuget\\packages\\bigreal\\5.7.0\\bigreal.5.7.0.nupkg.sha512",
-    "C:\\Users\\me_la\\.nuget\\packages\\jsonhcs\\6.5.0\\jsonhcs.6.5.0.nupkg.sha512",
     "C:\\Users\\me_la\\.nuget\\packages\\linkdotnet.stringbuilder\\3.4.1\\linkdotnet.stringbuilder.3.4.1.nupkg.sha512",
     "C:\\Users\\me_la\\.nuget\\packages\\markdig.signed\\0.44.0\\markdig.signed.0.44.0.nupkg.sha512",
     "C:\\Users\\me_la\\.nuget\\packages\\microsoft.aspnetcore.http.abstractions\\2.3.0\\microsoft.aspnetcore.http.abstractions.2.3.0.nupkg.sha512",

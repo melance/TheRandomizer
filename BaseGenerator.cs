@@ -3,13 +3,17 @@ using LB.Utility.Random;
 using System.Text.Json.Serialization;
 using TheRandomizer.Assignment;
 using TheRandomizer.Enumerators;
+using TheRandomizer.List;
 using TheRandomizer.Parameters;
+using TheRandomizer.Table;
 using TheRandomizer.Utility;
 
 namespace TheRandomizer;
 
 [JsonPolymorphic(TypeDiscriminatorPropertyName = "Type")]
 [JsonDerivedType(typeof(AssignmentGenerator), typeDiscriminator: "Assignment")]
+[JsonDerivedType(typeof(ListGenerator), typeDiscriminator: "List")]
+[JsonDerivedType(typeof(TableGenerator), typeDiscriminator: "Table")]
 public abstract class BaseGenerator
 {
     #region Serialization
@@ -43,8 +47,9 @@ public abstract class BaseGenerator
     }
     #endregion
 
-    public BaseGenerator() => PseudoRNG.Initialize();
-    public BaseGenerator(String seed) => PseudoRNG.Initialize(seed);
+    public BaseGenerator() => RNG = PseudoRNG.Initialize();
+    
+    public BaseGenerator(String seed) => RNG = PseudoRNG.Initialize(seed);
 
     #region Properties
     public virtual Version Version { get; set; } = new(1,0);
@@ -53,7 +58,9 @@ public abstract class BaseGenerator
     public virtual String Author { get; set; } = String.Empty;
     public virtual OutputFormats OutputFormat { get; set; } = OutputFormats.Text;
     public virtual ParameterList Parameters { get; set; } = [];
+    [JsonIgnore]
     public abstract Boolean SupportsParameters { get; }
+    [JsonIgnore]
     public virtual String FilePath { get; protected set; } = String.Empty;
     public virtual String? Seed
     {
@@ -69,6 +76,7 @@ public abstract class BaseGenerator
             }
         }
     }
+    protected virtual PseudoRNG RNG { get; set; }
     #endregion
 
     #region Public Methods
