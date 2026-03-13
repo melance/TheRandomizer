@@ -1,2 +1,4 @@
 /src/TheRandomizer.CLI/bin
 /src/TheRandomizer.CLI/obj
+/src/.vs/TheRandomizer/CopilotIndices
+/src/TheRandomizer.Tests/bin
