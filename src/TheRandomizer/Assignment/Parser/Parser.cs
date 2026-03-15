@@ -2,7 +2,8 @@
 
 internal abstract record Node();
 
-internal record NumberNode(Int32 Value) : Node;
+internal record IntegerNode(Int32 Value) : Node;
+internal record DecimalNode(Decimal Value) : Node;
 internal record StringNode(String Value) : Node;
 internal record BooleanNode(Boolean Value) : Node;
 internal record VariableNode(String Name) : Node;
@@ -218,11 +219,16 @@ internal class Parser
     private Node ParsePrimary()
     {
         if (Match(TokenTypes.Number))
-            return new NumberNode((Int32)Previous().Value!);
+        {
+            if (Previous().Value is Decimal d)
+                return new DecimalNode(d);
+            if (Previous().Value is Int32 i)
+                return new IntegerNode(i);
+        }
         if (Match(TokenTypes.String))
         {
             if (Int32.TryParse((String)Previous().Value!, out var i))
-                return new NumberNode(i);
+                return new IntegerNode(i);
             else
                 return new StringNode((String)Previous().Value!);
         }

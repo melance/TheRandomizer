@@ -70,6 +70,8 @@ internal sealed class Tokenizer(String expression)
                 return ReadString();
             case ':': // Assignment if followed by =
                 return ReadAssignment();
+            case '.':
+                return ReadNumber();
             case '-':
                 return ReadNumber();
         }
@@ -178,14 +180,23 @@ internal sealed class Tokenizer(String expression)
         var value = new StringBuilder();
         var multiplier = 1;
         Char? coin = null;
+        var period = false;
 
         if (Peek() == '-')
             value.Append(Next());
 
-        while (!Eof() && (Char.IsDigit(Peek()) || Peek() == '_'))
+        while (!Eof() 
+                && ((Char.IsDigit(Peek()) || Peek() == '_')
+                || (!period && Peek() == '.')))
         {
             if (Peek() != '_')
                 value.Append(Next());
+            if (Peek() == '.')
+            {
+                if (period)
+                    throw Error("Invalid number format: multiple decimal points.");
+                value.Append(Next());
+            }
         }
 
         if (Char.ToLowerInvariant(Peek()).In('c','s','e','g','p') 
@@ -202,12 +213,14 @@ internal sealed class Tokenizer(String expression)
                 _ => 1
             };
         }
-
-        if (!Int32.TryParse(value.ToString(), out Int32 n))
-            throw Error($"Invalid number '{value}'.", position);
+         
         if (coin != null)
             value.Append($"{coin}p");
-        return new Token(TokenTypes.Number, value.ToString(), position, n * multiplier);
+        if (Int32.TryParse(value.ToString(), out var n))
+            return new Token(TokenTypes.Number, value.ToString(), position, n * multiplier);
+        if (Decimal.TryParse(value.ToString(), out var d))
+            return new Token(TokenTypes.Number, value.ToString(), position, d * multiplier);
+        throw Error($"Invalid number '{value}'.", position);
     }
 
     private Token ReadOneOfOrOr()

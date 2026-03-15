@@ -307,7 +307,8 @@ public partial class AssignmentGenerator : BaseGenerator
     {
         return node switch
         {
-            NumberNode n => n.Value,
+            IntegerNode n => n.Value,
+            DecimalNode d => d.Value,
             StringNode s => s.Value,
             BooleanNode b => b.Value,
             VariableNode v => ReadVariable(v.Name),
@@ -315,6 +316,7 @@ public partial class AssignmentGenerator : BaseGenerator
             AssignmentNode a => EvalAssignment(a),
             CallNode c => EvalCall(c),
             BinaryNode b => EvalBinary(b),
+            UnaryNode u => EvalUnary(u),
             _ => throw new NotSupportedException($"Unknown node type: {node.GetType().Name}")
         };
     }
@@ -322,7 +324,7 @@ public partial class AssignmentGenerator : BaseGenerator
     private Object? EvalAssignment(AssignmentNode node)
     {
         var right = Evaluate(node.Value) ?? throw new AssignmentExpressionException($"Cannot assign void to '{node.Name}'.");
-        if (!right.GetType().In(typeof(String), typeof(Int32), typeof(Boolean)))
+        if (!right.GetType().In(typeof(String), typeof(Int32), typeof(Decimal), typeof(Boolean)))
             throw new AssignmentExpressionException($"Variables can only store primitives (String/Number/Boolean). '{node.Name}' got {right.GetType().Name}");
 
         Variables[node.Name] = right;
@@ -447,14 +449,16 @@ public partial class AssignmentGenerator : BaseGenerator
         var l = Evaluate(left);
         var r = Evaluate(right);
 
-        if (l is Int32 li && r is Int32 ri)
+        if (l is Decimal or Int32 && r is Decimal or Int32)
         {
+            var ln = Convert.ToDecimal(l!);
+            var rn = Convert.ToDecimal(r!);
             return op switch
             {
-                BinaryOperators.LessThan => li < ri,
-                BinaryOperators.GreaterThan => li > ri,
-                BinaryOperators.LessThanOrEqual => li <= ri,
-                BinaryOperators.GreaterThanOrEqual => li >= ri,
+                BinaryOperators.LessThan => ln < rn,
+                BinaryOperators.GreaterThan => ln > rn,
+                BinaryOperators.LessThanOrEqual => ln <= rn,
+                BinaryOperators.GreaterThanOrEqual => ln >= rn,
                 _ => false
             };
         }
@@ -471,6 +475,16 @@ public partial class AssignmentGenerator : BaseGenerator
         }
 
         throw new AssignmentExpressionException("Relational operators require two numbers or two strings");
+    }
+
+    private Boolean EvalUnary(UnaryNode node)
+    {
+        return node.Operator switch
+        {
+            UnaryOperators.Not => !EvalBoolean(node.Operand),
+            _ => throw new AssignmentExpressionException($"Invalid unary operator {node.Operator}")
+        };
+
     }
     #endregion
 
@@ -530,9 +544,9 @@ public partial class AssignmentGenerator : BaseGenerator
                 Dice.Variables[variable.Key] = l;
         }
         var result = Dice.Evaluate(expression);
-        if (result is IntegerValue iResult) return iResult.Value;
-        if (result is DecimalValue dResult) return dResult.Value;
-        if (result is BooleanValue bResult) return bResult.Value;
+        if (result is DiceRoller.Evaluator.IntegerValue iResult) return iResult.Value;
+        if (result is DiceRoller.Evaluator.DecimalValue dResult) return dResult.Value;
+        if (result is DiceRoller.Evaluator.BooleanValue bResult) return bResult.Value;
         throw new AssignmentExpressionException($"Invalid type returned from calculation '{expression}' : '{result.GetType().Name}'");
     }
 
@@ -864,6 +878,21 @@ public partial class AssignmentGenerator : BaseGenerator
 
     #region Boolean Functions
     /// <summary>
+    /// Restricts value to be between min and max exclusive
+    /// </summary>
+    [Function("Clamp", "Clamp(value, min, max)", MinArguments = 3, MaxArguments = 3)]
+    private Int32 FuncClamp(List<Node> nodes)
+    {
+        CheckArity(nodes);
+
+        var value = EvalAs<Int32>(nodes, 0);
+        var min = EvalAs<Int32>(nodes, 1);
+        var max = EvalAs<Int32>(nodes, 2);
+
+        return Math.Max(min, Math.Min(value, max));
+    }
+
+    /// <summary>
     /// Returns true if haystack contains needle
     /// </summary>
     [Function("Contains", "Contains(haystack, needle)", MinArguments = 2, MaxArguments = 2)]
@@ -941,6 +970,23 @@ public partial class AssignmentGenerator : BaseGenerator
             return cond ? Evaluate(nodes[1]) : Evaluate(nodes[2]);
         else
             return cond ? Evaluate(nodes[1]) : null;
+    }
+
+    /// <summary>
+    /// Performs If branches until finding one that is true
+    /// </summary>
+    [Function("Ifs", "Ifs(condition1, then[, condition2, then2 ...], else)", MinArguments = 3)]
+    private Object? FuncIfs(List<Node> nodes)
+    {
+        CheckArity(nodes);
+
+        for(var i = 0; i < nodes.Count - 1; i += 2)
+        {
+            var condition = EvalAs<Boolean>(nodes, i, "Ifs coditions must be a boolean.");
+            if (condition) return Evaluate(nodes[i + 1]);
+        }
+
+        return Evaluate(nodes.Last());
     }
 
     /// <summary>
@@ -1212,5 +1258,7 @@ public partial class AssignmentGenerator : BaseGenerator
         for(var i = start; i <= end; i++)
             yield return EvalAs<T>(nodes, i, allowNull, name);
     }
+
+    private static Boolean IsNumber(Node node) => node is IntegerNode or DecimalNode;
     #endregion
 }
