@@ -1,7 +1,6 @@
 ﻿using DiceRoller;
 using LB.Utility.Collections;
 using LB.Utility.Extensions;
-using LB.Utility.Random;
 using System.Globalization;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -323,7 +322,13 @@ public partial class AssignmentGenerator : BaseGenerator
         }
         catch (Exception ex)
         {
-            ex.Data.Add(nameof(expression), expression);
+            if (ex.Data.Contains(nameof(expression)))
+            {
+                var existing = ex.Data[nameof(expression)]!.ToString();
+                ex.Data[nameof(expression)] = $"{existing}/n{expression}";
+            }
+            else
+                ex.Data.Add(nameof(expression), expression);
             throw;
         }
     }

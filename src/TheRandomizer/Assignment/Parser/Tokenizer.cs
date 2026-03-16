@@ -199,7 +199,7 @@ internal sealed class Tokenizer(String expression)
             }
         }
 
-        if (Char.ToLowerInvariant(Peek()).In('c','s','e','g','p') 
+        if (Char.ToLowerInvariant(Peek()).In('c', 's', 'e', 'g', 'p')
             && Char.ToLowerInvariant(Peek(1)) == 'p')
         {
             coin = Next();
@@ -213,13 +213,15 @@ internal sealed class Tokenizer(String expression)
                 _ => 1
             };
         }
-         
+
+        var text = new StringBuilder(value.ToString());
+
         if (coin != null)
-            value.Append($"{coin}p");
+            text.Append($"{coin}p");
         if (Int32.TryParse(value.ToString(), out var n))
-            return new Token(TokenTypes.Number, value.ToString(), position, n * multiplier);
+            return new Token(TokenTypes.Number, text.ToString(), position, n * multiplier);
         if (Decimal.TryParse(value.ToString(), out var d))
-            return new Token(TokenTypes.Number, value.ToString(), position, d * multiplier);
+            return new Token(TokenTypes.Number, text.ToString(), position, d * multiplier);
         throw Error($"Invalid number '{value}'.", position);
     }
 

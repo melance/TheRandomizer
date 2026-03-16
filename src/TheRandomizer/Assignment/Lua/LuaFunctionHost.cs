@@ -17,6 +17,7 @@ internal sealed class LuaFunctionHost
         Script = new Script();
         Script.Globals["Register"] = (Action<String, DynValue>)Register;
         Script.Globals["RegisterAll"] = (Action<DynValue>)RegisterAll;
+        Script.Globals["FormatNumber"] = (Func<Decimal,String,String>)FormatNumber;
     }
 
     public void LoadFile(String path)
@@ -89,6 +90,11 @@ internal sealed class LuaFunctionHost
 
         foreach (var (Name, Function) in exports)
             Register(Name, Function);
+    }
+
+    private static String FormatNumber(Decimal number, String format)
+    {
+        return number.ToString(format);
     }
 
     private static Boolean IsValidName(String name)
