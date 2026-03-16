@@ -13,7 +13,6 @@ internal class TableGenerator : BaseGenerator
     public Dictionary<String, Table> Tables { get; set; } = [];
     public String Output { get; set; } = String.Empty;
     public InsensitiveDictionary<Object?> Variables { get; set; } = [];
-    private Dice Dice { get; } = new();
     #endregion
 
     #region Public Methods
