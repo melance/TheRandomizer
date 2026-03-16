@@ -11,7 +11,7 @@ internal class ListGenerator : BaseGenerator
 
     public override GeneratorResult Generate(params BaseParameter[] parameters)
     {
-        var i = PseudoRNG.Instance?.NextInt32(Content.Count - 1);
+        var i = RNG?.NextInt32(Content.Count - 1);
         if (i != null) return new () { Text = Content[i.Value] };
         return new ();
     }

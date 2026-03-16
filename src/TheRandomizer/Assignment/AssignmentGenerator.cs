@@ -1,5 +1,4 @@
 ﻿using DiceRoller;
-using DiceRoller.Evaluator;
 using LB.Utility.Collections;
 using LB.Utility.Extensions;
 using LB.Utility.Random;
@@ -10,6 +9,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
+using TheRandomizer.Assignment.Lua;
 using TheRandomizer.Assignment.Parser;
 using TheRandomizer.Parameters;
 using TheRandomizer.Pluralize;
@@ -22,6 +22,8 @@ namespace TheRandomizer.Assignment;
 
 public partial class AssignmentGenerator : BaseGenerator
 {
+    #region Functions
+
     private readonly Dictionary<String, Func<List<Node>, Object?>>? _functions;
 
     private static Dictionary<String, Func<List<Node>, Object?>> BuildFunctionRegistry(AssignmentGenerator target)
@@ -43,15 +45,18 @@ public partial class AssignmentGenerator : BaseGenerator
                 result[attr.Name] = lambda;
             }
         }
-        
+
 
         return result;
     }
+    #endregion
 
-    public AssignmentGenerator() : base() 
+    #region Constructor
+    public AssignmentGenerator() : base()
     {
         _functions = BuildFunctionRegistry(this);
-    }
+    } 
+    #endregion
 
     #region Enumerators
     #endregion
@@ -74,14 +79,14 @@ public partial class AssignmentGenerator : BaseGenerator
     public Boolean RemoveEmptyLines { get; set; }
     public LineItemDictionary LineItems { get; set; } = [];
     public List<String> Libraries { get; set; } = [];
-    [JsonIgnore]
-    public Func<String, List<Object>, Object?>? FunctionHandler { get; set; }
+    public List<String> Uses { get; set; } = [];
     #endregion
 
     #region Private Properties
     private InsensitiveDictionary<Object?> Variables { get; set; } = [];
     private Int32 LoopCount { get; set; }
     private Int32 RecursionDepth { get; set; }
+    private LuaFunctionHost LuaHost { get; } = new();
     #endregion
 
     #region Public Methods
@@ -93,6 +98,8 @@ public partial class AssignmentGenerator : BaseGenerator
 
         Variables.Clear();
         LoadLibraries();
+        LoadUses();
+        RegisterLuaFunctions();
         if (!PreProcessParameters())
             throw new ParameterValidationException(Parameters.ErrorList);
 
@@ -183,6 +190,24 @@ public partial class AssignmentGenerator : BaseGenerator
         }
     }
 
+    private void LoadUses()
+    {
+        foreach(var use in Uses)
+        {
+            var path = ResolveFilePath(use);
+
+            if (!File.Exists(path))
+                throw new FileNotFoundException($"Lua script file not found.", path);
+
+            LuaHost.LoadFile(path);
+        }
+    }
+
+    private void RegisterLuaFunctions()
+    {
+        LuaHost.Script.Globals["Calc"] = (Func<String, Object?>)(expr => FuncCalc([new StringNode(expr)]));
+    }
+
     private String ResolveFilePath(String path)
     {
         var resolved = Environment.ExpandEnvironmentVariables(path);
@@ -221,7 +246,7 @@ public partial class AssignmentGenerator : BaseGenerator
         if (list.Count == 0) return null;
         var totalWeight = (UInt32)list.Sum(i => Math.Max(i.Weight, 1));
 
-        var roll = RNG.NextUInt32(totalWeight);
+        var roll = RNG!.NextUInt32(totalWeight);
         var sum = 0;
 
         foreach(var item in list)
@@ -373,21 +398,14 @@ public partial class AssignmentGenerator : BaseGenerator
 
     private Object? EvalCall(CallNode node)
     {
-        if (!_functions!.TryGetValue(node.Name, out var function))
-        {
-            if (FunctionHandler == null)
-                throw new AssignmentExpressionException($"Unknown function '{node.Name}'.");
-            else
-            {
-                var parameters = new List<Object>();
-                foreach (var argument in node.Arguments)
-                {
-                    parameters.Add(Evaluate(argument) ?? throw new AssignmentExpressionException("EvalCall", "Parameter cannot be null"));
-                }
-                return FunctionHandler.Invoke(node.Name, parameters);
-            }
-        }
-        return function!.Invoke(node.Arguments);
+        if (_functions!.TryGetValue(node.Name, out var function))
+            return function!.Invoke(node.Arguments);
+
+        var arguments = node.Arguments.Select(Evaluate).ToArray();
+        if (LuaHost.TryInvoke(node.Name, arguments, out var result))
+            return result;
+
+        throw new AssignmentExpressionException($"Unrecognized function '{node.Name}'.");
     }
 
     /// <summary>
@@ -680,7 +698,7 @@ public partial class AssignmentGenerator : BaseGenerator
 
         for (Int32 i = 0; i < count; i++)
         {
-            var item = list.IsDeck ? list.DrawRandomItem() : SelectFromList(list);
+            var item = list.IsDeck ? list.DrawRandomItem(RNG!) : SelectFromList(list);
             if (item == null) return String.Empty;
             items.Add(Render(item.Content));
         }
@@ -819,7 +837,7 @@ public partial class AssignmentGenerator : BaseGenerator
         var lists = nodes.Select(EvalListArgument).ToList();
 
         var total = (UInt32)lists.Sum(l => (Int32)Math.Max(l.TotalWeight, 1U));
-        var roll = PseudoRNG.Instance?.NextUInt32((UInt32)nodes.Count)!;
+        var roll = RNG!.NextUInt32((UInt32)nodes.Count)!;
 
         return lists[(Int32)roll];
     }

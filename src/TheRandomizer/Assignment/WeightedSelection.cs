@@ -4,7 +4,7 @@ namespace TheRandomizer.Assignment;
 
 internal static class WeightedSelection
 {
-    public static LineItem Select(WeightedPool pool)
+    public static LineItem Select(WeightedPool pool, PseudoRNG rng)
     {
         if (pool.Sources.Count == 0)
             throw new InvalidOperationException("Cannot select from an empty pool");
@@ -16,7 +16,7 @@ internal static class WeightedSelection
         if (total == 0)
             throw new InvalidOperationException("Total weight is zero.");
 
-        var roll = PseudoRNG.Instance?.NextUInt64(total) ?? 0;
+        var roll = rng.NextUInt64(total);
         var sum = 0UL;
 
         foreach (var source in pool.Sources)
@@ -26,13 +26,13 @@ internal static class WeightedSelection
             if (roll < sum + weight)
             {
                 return source.List.IsDeck
-                        ? source.List.DrawRandomItem()
+                        ? source.List.DrawRandomItem(rng)
                         : SelectFromList(source.List, source.Multiplier, roll);
             }
 
             sum += weight;
         }
-        return pool.Sources.Last().List.SelectRandomLineItem();
+        return pool.Sources.Last().List.SelectRandomLineItem(rng);
     }
 
     private static UInt64 EffectiveWeight(LineItemList list, UInt32 multiplier)
