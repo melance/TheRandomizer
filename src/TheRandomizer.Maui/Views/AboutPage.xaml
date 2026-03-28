@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewModels="clr-namespace:TheRandomizer.Maui.ViewModels"
+             xmlns:controls="clr-namespace:TheRandomizer.Maui.Controls"
+             x:Class="TheRandomizer.Maui.Views.AboutPage"
+             x:DataType="viewModels:AboutViewModel"
+             Title="About">
+    <ScrollView>
+        <VerticalStackLayout Padding="16" Spacing="12">
+            <HorizontalStackLayout Spacing="8">
+            <Label 
+                Text="{Binding Name}"
+                Style="{StaticResource Headline}" />
+            <Label
+                Text="{Binding Version}"
+                Style="{StaticResource SubHeadline}"
+                VerticalOptions="End"/>                
+            </HorizontalStackLayout>
+            <Label
+                Text="{Binding Description}" />
+            <HorizontalStackLayout Spacing="8">
+                <Label
+                    Text="Build Version" Style="{StaticResource Muted}" />
+                <Label
+                    Text="{Binding Build}" />
+            </HorizontalStackLayout>
+            <HorizontalStackLayout Spacing="8">
+                <Label
+                    Text="Author" Style="{StaticResource Muted}" />
+                <Label
+                    Text="{Binding Author}" />
+            </HorizontalStackLayout>
+            <HorizontalStackLayout Spacing="8">
+                <Label
+                    Text="GitHub" Style="{StaticResource Muted}" />
+                <controls:LinkLabel
+                    Url="{Binding GitHubUrl}"
+                    Text="{Binding GitHubUrl}" />
+            </HorizontalStackLayout>
+            <HorizontalStackLayout Spacing="8">
+                <Label
+                    Text="Reddit" Style="{StaticResource Muted}" />
+                <controls:LinkLabel
+                    Url="{Binding Subreddit}"
+                    Text="{Binding Subreddit}" />
+            </HorizontalStackLayout>
+            <HorizontalStackLayout Spacing="8">
+                <Label
+                    Text="Generator Directory" Style="{StaticResource Muted}" />
+                <Label
+                    Text="{Binding GeneratorDirectory}" />
+                <Label
+                    Style="{DynamicResource Link}"
+                    Text="Copy">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer
+                            Command="{Binding CopyPathCommand}"
+                            CommandParameter="{Binding GeneratorDirectory}" />
+                    </Label.GestureRecognizers>
+                </Label>
+            </HorizontalStackLayout>
+            <HorizontalStackLayout Spacing="8">
+                <Label
+                    Text="Theme Directory" Style="{StaticResource Muted}" />
+                <Label
+                    Text="{Binding ThemeDirectory}" />
+                <Label
+                    Style="{DynamicResource Link}"
+                    Text="Copy">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer
+                            Command="{Binding CopyPathCommand}"
+                            CommandParameter="{Binding ThemeDirectory}" />
+                    </Label.GestureRecognizers>
+                </Label>
+            </HorizontalStackLayout>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

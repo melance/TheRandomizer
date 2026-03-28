@@ -1,0 +1,221 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewModels="clr-namespace:TheRandomizer.Maui.ViewModels"
+             xmlns:models="clr-namespace:TheRandomizer.Application.Models;assembly=TheRandomizer.Application"
+             xmlns:results="clr-namespace:TheRandomizer.Application.Models.Results;assembly=TheRandomizer.Application"
+             xmlns:mauiModels="clr-namespace:TheRandomizer.Maui.Models"
+             xmlns:controls="clr-namespace:TheRandomizer.Maui.Controls"
+             x:Class="TheRandomizer.Maui.MainPage"
+             x:DataType="viewModels:MainViewModel"
+             IconImageSource="question.png"
+             Title="The Randomizer">
+    <ContentPage.Resources>
+        <x:Boolean x:Key="True">true</x:Boolean>
+        <x:Boolean x:Key="False">false</x:Boolean>
+    </ContentPage.Resources>
+    <Grid 
+        Padding="12" 
+        ColumnDefinitions="1*,1*,2*"
+        RowDefinitions="Auto,*">
+        <!-- Search -->
+        <Border
+            Grid.Row="0"
+            Grid.Column="0"
+            Grid.ColumnSpan="3"
+            Padding="6">
+            <VerticalStackLayout Spacing="8">
+                <Grid ColumnSpacing="8" ColumnDefinitions="Auto,*">
+                    <Label 
+                        Grid.Column="0" 
+                        Text="Search" 
+                        VerticalOptions="Center" 
+                        Style="{StaticResource Title}" />
+                    <SearchBar 
+                        Grid.Column="1" 
+                        Text="{Binding SearchText}"
+                        Placeholder="Search name or description..." 
+                        HorizontalOptions="Fill" />
+                </Grid>
+                <Grid ColumnSpacing="8" ColumnDefinitions="Auto,*,Auto">
+                    <Label Grid.Column="0" Text="Tags" Style="{StaticResource Title}" />
+                    <ScrollView 
+                        Grid.Column="1"
+                        HeightRequest="80"
+                        VerticalScrollBarVisibility="Always">
+                        <FlexLayout
+                            BindableLayout.ItemsSource="{Binding AvailableTags}"
+                            Direction="Row"
+                            Wrap="Wrap"
+                            AlignItems="Start">
+                            <BindableLayout.ItemTemplate>
+                                <DataTemplate x:DataType="viewModels:TagFilterItemViewModel">
+                                    <Border
+                                        Style="{StaticResource Pill}">
+                                        <Border.GestureRecognizers>
+                                            <TapGestureRecognizer Command="{Binding ToggleCommand}" />
+                                        </Border.GestureRecognizers>
+                                        <Border.Triggers>
+                                            <DataTrigger TargetType="Border"
+                                                         Binding="{Binding IsSelected}"
+                                                         Value="False">
+                                                <Setter Property="BackgroundColor"
+                                                        Value="{DynamicResource Tertiary}" />
+                                            </DataTrigger>
+                                        </Border.Triggers>
+                                        <Label
+                                            Text="{Binding Tag}"
+                                            VerticalOptions="Center" />
+                                    </Border>
+                                </DataTemplate>
+                            </BindableLayout.ItemTemplate>
+                        </FlexLayout>
+                    </ScrollView>
+                </Grid>
+            </VerticalStackLayout>
+        </Border>
+        <Border
+            Grid.Row="1"
+            Grid.Column="0"
+            StrokeThickness="1"
+            Padding="6">
+            <Grid RowDefinitions="Auto,*,Auto" RowSpacing="3">
+                <Label Grid.Row="0" Text="Generators" Style="{StaticResource Title}" />
+                <!-- Generator List -->
+                <CollectionView
+                    Grid.Row="1"
+                    ItemsSource="{Binding FilteredFiles}"
+                    SelectionMode="Single"
+                    SelectedItem="{Binding SelectedFile}">
+                    
+                    <CollectionView.GestureRecognizers>
+                        <TapGestureRecognizer
+                            NumberOfTapsRequired="2"
+                            Tapped="TapGestureRecognizer_Tapped" />
+                    </CollectionView.GestureRecognizers>
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="models:GeneratorFileItem">
+                            <Grid Padding="6" ColumnDefinitions="*">
+                                <Label 
+                                    Text="{Binding Name}" 
+                                    ToolTipProperties.Text="{Binding Summary.Description}"/>
+                            </Grid>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+                <!-- Generator Details -->
+                <Border Grid.Row="2" StrokeThickness="1" Padding="8" Margin="0,8,0,0">
+                    <VerticalStackLayout Spacing="6">
+                        <Label Text="{Binding SelectedFile.Name}" Style="{StaticResource Title}"  />
+                        <Label Text="{Binding SelectedFile.Summary.Description}" LineBreakMode="WordWrap" />
+                        <Grid 
+                            ColumnDefinitions="Auto,*"
+                            RowDefinitions="Auto,Auto,Auto,Auto"
+                            ColumnSpacing="3">
+                            <Label Grid.Column="0" Grid.Row="0" Text="Type" LineBreakMode="WordWrap" />
+                            <Label Grid.Column="1" Grid.Row="0" Text="{Binding SelectedFile.Summary.Type}" />
+                            <Label Grid.Column="0" Grid.Row="1" Text="Version" LineBreakMode="WordWrap" />
+                            <Label Grid.Column="1" Grid.Row="1" Text="{Binding SelectedFile.Summary.Version}" />
+                            <Label Grid.Column="0" Grid.Row="2" Text="Author" LineBreakMode="WordWrap" />
+                            <Label Grid.Column="1" Grid.Row="2" Text="{Binding SelectedFile.Summary.Author}" />
+                            <Label Grid.Column="0" Grid.Row="3" Text="Tags" LineBreakMode="WordWrap" />
+                            <Label Grid.Column="1" Grid.Row="3" Text="{Binding SelectedFile.Summary.TagList}" />
+                        </Grid>
+                        <!-- Generator List Actions-->
+                        <HorizontalStackLayout Grid.Row="3" Padding="4,3" Spacing="6">
+                            <controls:IconButton
+                            Glyph="{StaticResource IconImport}"
+                            Clicked="OnImportClicked"
+                            ToolTipProperties.Text="Import a generator" />
+                            <controls:IconButton
+                            Glyph="{StaticResource IconRefresh}"
+                            Command="{Binding RefreshFilesCommand}" 
+                            ToolTipProperties.Text="Refresh generator list" />
+                            <controls:IconButton
+                            Glyph="{StaticResource IconEdit}"
+                            Command="{Binding EditMetaDataCommand}"
+                            ToolTipProperties.Text="Edit the selected generator metadata" />
+                            <Button 
+                            Text="Load"
+                            Command="{Binding LoadFileCommand}" 
+                            ToolTipProperties.Text="Load the selected generator"/>
+                        </HorizontalStackLayout>
+                    </VerticalStackLayout>
+                </Border>
+            </Grid>
+        </Border>
+        <Border
+            Grid.Row="1"
+            Grid.Column="1"
+            StrokeThickness="1"
+            Padding="8"
+            MinimumWidthRequest="200">
+            <ScrollView>
+                <!-- Generator Parameters -->
+                <Grid RowDefinitions="*,Auto">
+                    <VerticalStackLayout Spacing="10" Grid.Row="0">
+                        <Label Text="Generator" Style="{StaticResource Title}" />
+                        <Label Grid.Column="1" Text="{Binding CurrentGenerator.Name}" FontAttributes="Bold" FontSize="16" />
+                        <CollectionView ItemsSource="{Binding Parameters}" >
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate x:DataType="mauiModels:ParameterEditorItem">
+                                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="3" Padding="0,0,0,8">
+                                        <Label Grid.Column="0" Text="{Binding Name}" Margin="0,0,8,0" VerticalOptions="Center" />
+                                        <Entry
+                                        Grid.Column="1"
+                                        IsVisible="{Binding IsText}"
+                                        Text="{Binding ValueText}" />
+
+                                        <Entry
+                                        Grid.Column="1"
+                                        IsVisible="{Binding IsInteger}"
+                                        Text="{Binding ValueInteger}"
+                                        Keyboard="Numeric" />
+
+                                        <Entry
+                                        Grid.Column="1"
+                                        IsVisible="{Binding IsDecimal}"
+                                        Text="{Binding ValueDecimal}"
+                                        Keyboard="Numeric" />
+
+                                        <CheckBox
+                                        Grid.Column="1"
+                                        IsVisible="{Binding IsBoolean}"
+                                        IsChecked="{Binding ValueBoolean}" />
+
+                                        <Picker
+                                        Grid.Column="1"
+                                        IsVisible="{Binding IsSelect}"
+                                        ItemsSource="{Binding Options}"
+                                        SelectedItem="{Binding ValueOption}" />
+                                    </Grid>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+                    </VerticalStackLayout>
+                    <controls:IconButton
+                        x:Name="btnGenerate"
+                        Grid.Row="1"
+                        Glyph="{StaticResource IconPlay}"
+                        ToolTipProperties.Text="Generate content" 
+                        Command="{Binding RunGeneratorCommand}"/>
+                </Grid>
+            </ScrollView>
+        </Border>
+        <Border Grid.Column="2" Grid.Row="1">
+            <Grid RowDefinitions="*,Auto" Margin="0,6,0,6" Padding="8,0,8,0">
+                <WebView Grid.Row="0" x:Name="OutputView" Source="{Binding OutputSource}" />
+                <HorizontalStackLayout Grid.Row="1" HorizontalOptions="End" Spacing="6">
+                    <Button 
+                        Text="Copy" 
+                        Command="{Binding CopyToClipboardCommand}"
+                        CommandParameter="{StaticResource False}"/>
+                    <Button 
+                        Text="Copy Raw" 
+                        Command="{Binding CopyToClipboardCommand}"
+                        CommandParameter="{StaticResource True}"/>
+                </HorizontalStackLayout>
+            </Grid>
+        </Border>
+    </Grid>
+</ContentPage>

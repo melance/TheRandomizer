@@ -42,10 +42,10 @@ public class SelectOptionJsonConverter : JsonConverter<Option>
 
             switch (property)
             {
-                case "Value":
+                case nameof(Option.Value):
                     value = reader.TokenType == JsonTokenType.String ? reader.GetString() ?? String.Empty : String.Empty;
                     break;
-                case "Weight":
+                case nameof(Option.Display):
                     display = reader.TokenType == JsonTokenType.String ? reader.GetString() : null;
                     break;
                 default:

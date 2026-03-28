@@ -47,14 +47,14 @@ internal class Program
         WriteInfoLine("Lines", text.Split(Environment.NewLine).Length);
         if (isLibrary)
         {
-            var library = Utility.Serialization.Deserialize<LineItemDictionary>(text, Enumerators.FileFormatTypes.Json)
+            var library = Utility.Serialization.Deserialize<LineItemDictionary>(text, Enumerators.FileFormatTypes.Jsonh)
                             ?? throw new Exception("Error deserializing the file.");
 
             WriteLineItemDictionary(library);
         }
         else
         {
-            var generator = BaseGenerator.Deserialize(text, Enumerators.FileFormatTypes.Json)
+            var generator = BaseGenerator.Deserialize(text, Enumerators.FileFormatTypes.Jsonh)
                             ?? throw new Exception("Error deserializing the file.");
                 
             WriteInfoLine("Type", generator.GetType().Name);

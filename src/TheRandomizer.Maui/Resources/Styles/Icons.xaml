@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ResourceDictionary xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="TheRandomizer.Maui.Resources.Styles.Icons">
+    <x:String x:Key="IconAdd">&#xF109;</x:String>
+    <x:String x:Key="IconCopy">&#xF32B;</x:String>
+    <x:String x:Key="IconDelete">&#xE47B;</x:String>
+    <x:String x:Key="IconEdit">&#xF3DD;</x:String>
+    <x:String x:Key="IconImport">&#xF1A4;</x:String>
+    <x:String x:Key="IconPlay">&#xF605;</x:String>
+    <x:String x:Key="IconRefresh">&#xF191;</x:String>
+    <x:String x:Key="IconSave">&#xF67F;</x:String>
+</ResourceDictionary>

@@ -22,7 +22,7 @@ public abstract class BaseGenerator
         var extension = Path.GetExtension(fileName).ToLowerInvariant();
         return extension switch
         {
-            var x when x.In(".json",".jsonh") => FileFormatTypes.Json,
+            var x when x.In(".json",".jsonh") => FileFormatTypes.Jsonh,
             _ => throw new Exception($"Unrecognized file extension '{extension}'.")
         };
     }
@@ -33,19 +33,22 @@ public abstract class BaseGenerator
         var text = File.ReadAllText(filePath);
         var definition = Serialization.Deserialize<BaseGenerator>(text, format);
         definition?.FilePath = filePath;
-        definition?.RNG = new PseudoRNG(seed);
-        definition?.Dice = new DiceRoller.Dice(seed, new DiceRoller.EvaluatorOptions() { Flags = DiceRoller.EvaluatorFlags.IncludeDNDCoins });
+        definition?.RNG = new(seed);
+        definition?.Dice = new(seed, new DiceRoller.EvaluatorOptions() { Flags = DiceRoller.EvaluatorFlags.IncludeDNDCoins });
         return definition;
     }
 
-    public static BaseGenerator? Deserialize(String definition, FileFormatTypes format)
+    public static BaseGenerator? Deserialize(String definition, FileFormatTypes format, String? seed = null)
     {
-        return Serialization.Deserialize<BaseGenerator>(definition, format);
+        var generator = Serialization.Deserialize<BaseGenerator>(definition, format);
+        generator?.RNG = new(seed);
+        generator?.Dice = new(seed, new DiceRoller.EvaluatorOptions() { Flags = DiceRoller.EvaluatorFlags.IncludeDNDCoins });
+        return generator;
     }
 
-    public static String? Serialize<T>(T definition, FileFormatTypes type) where T : BaseGenerator
+    public static String? Serialize<T>(T definition, String? seed = null) where T : BaseGenerator
     {
-        return Serialization.Serialize(definition, type);
+        return Serialization.Serialize(definition, FileFormatTypes.Jsonh);
     }
     #endregion
 
@@ -61,6 +64,8 @@ public abstract class BaseGenerator
     public virtual String Author { get; set; } = String.Empty;
     public virtual OutputFormats OutputFormat { get; set; } = OutputFormats.Text;
     public virtual ParameterList Parameters { get; set; } = [];
+    public virtual Boolean Show { get; set; } = true;
+    public virtual List<String> Tags { get; set; } = [];
     [JsonIgnore]
     public abstract Boolean SupportsParameters { get; }
     [JsonIgnore]
@@ -74,9 +79,7 @@ public abstract class BaseGenerator
 
     public abstract List<String> VerifyDefinition();
 
-    public override String ToString() => ToString(FileFormatTypes.Json);
-
-    public String ToString(FileFormatTypes format) => Serialize(this, format) ?? String.Empty;
+    public override String ToString() => Serialize(this) ?? String.Empty;
     #endregion
 }
 

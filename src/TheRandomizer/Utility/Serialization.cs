@@ -37,7 +37,7 @@ internal static class Serialization
     {
         return type switch
         {
-            FileFormatTypes.Json => JsonSerializer.Serialize(obj, JsonOptions),
+            FileFormatTypes.Jsonh => JsonSerializer.Serialize(obj, JsonOptions),
             _ => throw new Exception($"Unrecognized file format {type}."),
         };
     }
@@ -46,7 +46,7 @@ internal static class Serialization
     {
         return type switch
         {
-            FileFormatTypes.Json => DeserializeJson(text, typeof(T)) as T,
+            FileFormatTypes.Jsonh => DeserializeJson(text, typeof(T)) as T,
             _ => throw new Exception($"Unrecognized file format {type}."),
         };
     }
@@ -54,7 +54,7 @@ internal static class Serialization
     public static Object? Deserialize(String text, Type returnType, FileFormatTypes type)
     {
         return type switch {
-            FileFormatTypes.Json => DeserializeJson(text, returnType),
+            FileFormatTypes.Jsonh => DeserializeJson(text, returnType),
             _ => throw new Exception($"Unrecognized file format {type}."),
         };
     }

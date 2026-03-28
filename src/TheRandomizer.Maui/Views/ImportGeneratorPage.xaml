@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewModels="clr-namespace:TheRandomizer.Maui.ViewModels"
+             x:DataType="viewModels:ImportGeneratorViewModel"
+             x:Class="TheRandomizer.Maui.Views.ImportGeneratorPage"
+             Title="Import Generator">
+    <VerticalStackLayout Padding="16" Spacing="10">
+        <Label Text="Import Generator" FontSize="18" />
+
+        <Label Text="Import File"/>
+        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+            <Entry
+                Grid.Column="0"
+                Text="{Binding SourceFilePath}"
+                IsReadOnly="True"
+                Placeholder="Choose a generator, library, or lua file." />
+            <Button
+                Grid.Column="1"
+                Text="Browse"
+                Command="{Binding BrowseSourceFileCommand}" />
+        </Grid>
+
+        <Label Text="Existing Subfolder"/>
+        <Picker 
+            ItemsSource="{Binding Subfolders}"
+            SelectedItem="{Binding SelectedSubfolder}" />
+
+        <Label Text="Or New Subfolder" />
+        <Entry
+            Text="{Binding NewSubfolder}"
+            Placeholder="Add a new subfolder" />
+
+        <Label Text="{Binding StatusMessage}"
+               LineBreakMode="WordWrap" />
+
+        <HorizontalStackLayout Spacing="8">
+            <Button Text="Cancel" Clicked="OnCancelClicked" />
+            <Button Text="Import" Clicked="OnImportClicked" />
+        </HorizontalStackLayout>
+    </VerticalStackLayout>
+</ContentPage>

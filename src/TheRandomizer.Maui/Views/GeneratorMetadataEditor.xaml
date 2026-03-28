@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="TheRandomizer.Maui.Views.GeneratorMetadataEditor"
+             xmlns:viewModels="clr-namespace:TheRandomizer.Maui.ViewModels"
+             xmlns:controls="clr-namespace:TheRandomizer.Maui.Controls"
+             x:DataType="viewModels:GeneratorMetadataEditorViewModel"
+             Title="Generator Metadata">
+    <ScrollView>
+        <VerticalStackLayout Padding="10" Spacing="16">
+            <Label 
+                Text="{Binding Generator.Name}" 
+                Style="{StaticResource Headline}" />
+            <VerticalStackLayout Spacing="8">
+                <Label Text="Tags" />
+                <FlexLayout
+                    BindableLayout.ItemsSource="{Binding Tags}"
+                    Direction="Row"
+                    Wrap="Wrap"
+                    JustifyContent="Start"
+                    AlignItems="Start"
+                    AlignContent="Start">
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate x:DataType="viewModels:TagViewModel">
+                            <Border 
+                                Style="{StaticResource Pill}">
+                                <Grid
+                                    ColumnDefinitions="Auto,*"
+                                    ColumnSpacing="8">
+                                    <Label
+                                        Grid.Column="0"
+                                        Text="{Binding Name}"
+                                        VerticalOptions="Center"
+                                        LineBreakMode="NoWrap" />
+                                    <controls:IconButton
+                                        Grid.Column="1"
+                                        Command="{Binding DeleteCommand}"
+                                        Glyph="{StaticResource IconDelete}" />
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
+                </FlexLayout>
+                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                    <Entry 
+                        Grid.Column="0"
+                        Placeholder="Add Tag"
+                        Text="{Binding NewTag}" />
+                    <controls:IconButton
+                        Grid.Column="1"
+                        Command="{Binding AddTagCommand}"
+                        Glyph="{StaticResource IconAdd}" />
+                </Grid>
+                <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
+                    <controls:IconButton
+                        Style="{DynamicResource DangerButton}"
+                        Grid.Column="1"
+                        Glyph="{StaticResource IconDelete}" />
+                    <controls:IconButton
+                        Grid.Column="2"
+                        Glyph="{StaticResource IconSave}" />
+                </Grid>
+            </VerticalStackLayout>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage> 

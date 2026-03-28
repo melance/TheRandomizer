@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="TheRandomizer.Maui.Controls.IconButton"
+             x:Name="Self">
+    <Border
+        x:Name="ButtonBorder"
+        BackgroundColor="{Binding Source={Reference Self}, Path=CurrentBackgroundColor}"
+        StrokeThickness="0"
+        Padding="0">
+        <Border.StrokeShape>
+            <RoundRectangle CornerRadius="{Binding Source={Reference Self}, Path=CornerRadius}" />
+        </Border.StrokeShape>
+        <ImageButton
+            x:Name="InnerButton"
+            BackgroundColor="Transparent"
+            IsEnabled="{Binding Source={Reference Self},Path=IsEnabled}"
+            Command="{Binding Source={Reference Self}, Path=Command}"
+            CommandParameter="{Binding Source={Reference Self}, Path=CommandParameter}"
+            Clicked="OnClicked"
+            Pressed="OnPressed"
+            Released="OnReleased"
+            WidthRequest="{Binding Source={Reference Self}, Path=ButtonSize}"
+            HeightRequest="{Binding Source={Reference Self}, Path=ButtonSize}"
+            Padding="{Binding Source={Reference Self}, Path=ButtonPadding}">
+            <ImageButton.Source>
+                <FontImageSource
+                    FontFamily="{Binding Source={Reference Self}, Path=FontFamilyName}"
+                    Glyph="{Binding Source={Reference Self}, Path=CurrentGlyph}"
+                    Size="{Binding Source={Reference Self}, Path=IconSize}"
+                    Color="{Binding Source={Reference Self}, Path=CurrentTextColor}"/>
+            </ImageButton.Source>
+        </ImageButton>
+    </Border>
+</ContentView>

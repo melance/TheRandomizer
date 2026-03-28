@@ -2,7 +2,7 @@
   "profiles": {
     "TheRandomizer.CLI": {
       "commandName": "Project",
-      "commandLineArgs": "generate \"C:\\Users\\me_la\\source\\repos\\Ærethia2\\Ærethia2\\wwwroot\\data\\randomizer\\weather.rgen.jsonh\" --repeat 100"
+      "commandLineArgs": "generate \"C:\\Users\\me_la\\source\\repos\\Ærethia2\\Ærethia2\\wwwroot\\data\\randomizer\\weather.rgen.jsonh\""
     },
     "View Help": {
       "commandName": "Project",

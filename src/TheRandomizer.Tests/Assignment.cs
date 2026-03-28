@@ -84,7 +84,7 @@ public sealed class Assignment
       }
     ]
   }";
-        var generator = BaseGenerator.Deserialize(json, Enumerators.FileFormatTypes.Json);
+        var generator = BaseGenerator.Deserialize(json, Enumerators.FileFormatTypes.Jsonh);
 
         yield return new (generator!, "Test");
 
@@ -98,7 +98,7 @@ public sealed class Assignment
     ]
 }
 ";
-        generator = BaseGenerator.Deserialize(json, Enumerators.FileFormatTypes.Json);
+        generator = BaseGenerator.Deserialize(json, Enumerators.FileFormatTypes.Jsonh);
         yield return new(generator!, "HelloWorld");
 
         json =
@@ -116,7 +116,7 @@ public sealed class Assignment
     ]
 }
 ";
-        generator = BaseGenerator.Deserialize(json, Enumerators.FileFormatTypes.Json);
+        generator = BaseGenerator.Deserialize(json, Enumerators.FileFormatTypes.Jsonh);
         yield return new(generator!, "Hello World");
 
         json =
@@ -129,7 +129,7 @@ public sealed class Assignment
     ]
 }
 ";
-        generator = BaseGenerator.Deserialize(json, Enumerators.FileFormatTypes.Json);
+        generator = BaseGenerator.Deserialize(json, Enumerators.FileFormatTypes.Jsonh);
         yield return new(generator!, "Test");
     }
 }

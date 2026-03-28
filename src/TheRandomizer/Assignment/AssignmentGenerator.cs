@@ -85,7 +85,7 @@ public partial class AssignmentGenerator : BaseGenerator
     private InsensitiveDictionary<Object?> Variables { get; set; } = [];
     private Int32 LoopCount { get; set; }
     private Int32 RecursionDepth { get; set; }
-    private LuaFunctionHost LuaHost { get; } = new();
+    private LuaFunctionHost LuaHost { get; set; } = new();
     #endregion
 
     #region Public Methods
@@ -94,7 +94,7 @@ public partial class AssignmentGenerator : BaseGenerator
         if (LineItems.Sum(li => li.Value.Count) == 0) throw new DefinitionException($"Assignment definition \"{Name}\" has no line items.");
         LoopCount = 0;
         RecursionDepth = 0;
-
+        LuaHost = new();
         Variables.Clear();
         LoadLibraries();
         LoadUses();

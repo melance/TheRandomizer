@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewModels="clr-namespace:TheRandomizer.Maui.ViewModels"
+             x:Class="TheRandomizer.Maui.Views.SettingsPage"
+             x:DataType="viewModels:SettingsViewModel"
+             Title="Settings">
+    <VerticalStackLayout Padding="6">
+        <Grid ColumnDefinitions="Auto,*,*,Auto" RowDefinitions="Auto,Auto,Auto,Auto,Auto" RowSpacing="6">
+            <Label Grid.Column="0" Text="Generator Folder" VerticalTextAlignment="Center" />
+            <Entry Grid.Column="1" Grid.ColumnSpan="2" Margin="6,0"  Text="{Binding GeneratorFolder}" IsReadOnly="true" />
+            <Button 
+                IsVisible="{Binding CanBrowseFolder}"
+                Grid.Column="3" 
+                Text="Browse" 
+                Command="{Binding PickGeneratorFolderCommand}" />
+
+            <Label Grid.Column="0" Grid.Row="1" Text="App Theme" VerticalTextAlignment="Center" />
+            <Picker Grid.Column="1"
+                    Grid.ColumnSpan="2"
+                    Grid.Row="1"
+                    Margin="6,0"
+                    ItemsSource="{Binding AppThemeOptions}"
+                    SelectedItem="{Binding AppTheme}">                
+            </Picker>
+
+            <Label Grid.Column="0" Grid.Row="2" Text="Color Theme" VerticalTextAlignment="Center"/>
+            <Picker Grid.Column="1"
+                    Grid.ColumnSpan="3" 
+                    Grid.Row="2"
+                    Margin="6,0"
+                    ItemsSource="{Binding Themes}"
+                    SelectedItem="{Binding SelectedTheme}">
+                <Picker.ItemDisplayBinding>
+                    <Binding Path="Name" />
+                </Picker.ItemDisplayBinding>
+            </Picker>
+
+            <Label Grid.Column="0" Grid.Row="3" Text="Font" VerticalTextAlignment="Center" />
+            <HorizontalStackLayout Grid.Column="1" Grid.ColumnSpan="2" Grid.Row="3" Margin="6,0">                
+                <Picker ItemsSource="{Binding FontOptions}"
+                        SelectedItem="{Binding FontFamily}">
+                    <Picker.ItemDisplayBinding>
+                        <Binding Path="Name" />
+                    </Picker.ItemDisplayBinding>
+                </Picker>
+                <Picker ItemsSource="{Binding FontSizeOptions}"
+                        SelectedItem="{Binding FontSize}">
+                    <Picker.ItemDisplayBinding>
+                        <Binding Path="Name" />
+                    </Picker.ItemDisplayBinding>
+                </Picker>
+            </HorizontalStackLayout>
+        </Grid>
+        <HorizontalStackLayout Spacing="8">
+            <Button HorizontalOptions="End" MaximumWidthRequest="100" Text="Reset" Command="{Binding ResetCommand}" />
+            <Button HorizontalOptions="End" MaximumWidthRequest="100" Text="Save" Command="{Binding SaveCommand}" />            
+        </HorizontalStackLayout>
+    </VerticalStackLayout>
+</ContentPage>
