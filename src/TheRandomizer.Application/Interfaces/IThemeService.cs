@@ -6,6 +6,7 @@ namespace TheRandomizer.Application.Interfaces;
 public interface IThemeService
 {
     String ThemesFolder { get; }
+    String CustomCSSFile { get; }
 
     void ReapplyTheme();
     void ApplyTheme(String themeId);

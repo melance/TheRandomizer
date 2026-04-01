@@ -8,18 +8,10 @@
 <DOCTYPE html>
 <html>
     <head>
-        <meta charset='utf-8' />   
+        <meta charset='utf-8' />
         <style>
-            @media (prefers-color-scheme: dark){{
-                body {{
-                    color: #dddddd;
-                }}
-            }}
-            @media (prefers-color-scheme: light){{
-                body {{
-                    color: #000000;
-                }}
-            }}
+            <#= Style #>
+			<#= CustomCSS #>
         </style>
     </head>
     <body>

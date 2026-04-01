@@ -87,6 +87,7 @@ public sealed class ThemeService : IThemeService
     #region Properties
     public static String DefaultThemeId => DEFAULT_THEME_ID;
     public String ThemesFolder => Path.Combine(FileSystem.Current.AppDataDirectory, "Themes");
+    public String CustomCSSFile => Path.Combine(FileSystem.Current.AppDataDirectory, "CSS", "custom.css");
     #endregion
 
     #region Public Methods

@@ -4,7 +4,7 @@ using TheRandomizer.Application.Interfaces;
 
 namespace TheRandomizer.Maui.Services;
 
-internal class AppSettingService : IAppSettingsService
+internal class AppSettingService() : IAppSettingsService
 {
     public String GeneratorFolder
     {

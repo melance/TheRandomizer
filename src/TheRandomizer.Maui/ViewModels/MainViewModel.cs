@@ -1,7 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using LB.Utility.Extensions;
-using Microsoft.AspNetCore.Mvc.Filters;
 using System.Collections.ObjectModel;
 using TheRandomizer.Application.Enumerators;
 using TheRandomizer.Application.Interfaces;
@@ -22,6 +20,7 @@ public sealed partial class MainViewModel : ObservableObject
     private readonly IGeneratorFileBrowser _fileBrowser;
     private readonly IAppSettingsService _settings;
     private readonly INavigationService _navigationService;
+    private readonly IThemeService _themeService;
     #endregion
 
     #region Properties
@@ -66,13 +65,15 @@ public sealed partial class MainViewModel : ObservableObject
                          IGeneratorRunner runner,
                          IGeneratorFileBrowser fileBrowser,
                          IAppSettingsService settings,
-                         INavigationService navigationService)
+                         INavigationService navigationService,
+                         IThemeService themeService)
     {
         _loader = loader;
         _runner = runner;
         _fileBrowser = fileBrowser;
         _settings = settings;
         _navigationService = navigationService;
+        _themeService = themeService;
                 
         SelectedFolder = Preferences.Default.Get(nameof(SelectedFolder), String.Empty);
         RefreshFilesAsync().Wait();
@@ -290,11 +291,9 @@ public sealed partial class MainViewModel : ObservableObject
         }
     }
 
-    private static String GenerateHtml(GeneratorResult output)
+    private String GenerateHtml(GeneratorResult output)
     {
-        // Todo: Add custom CSS
-        // Todo: Handle dark mode
-        var template = new Output(output);
+        var template = new Output(_settings, _themeService, output);
         return template.TransformText();
     }
 

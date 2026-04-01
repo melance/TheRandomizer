@@ -29,28 +29,24 @@ namespace TheRandomizer.Maui.Resources.Templates
         /// </summary>
         public virtual string TransformText()
         {
-            this.Write(@"
-<DOCTYPE html>
-<html>
-    <head>
-        <meta charset='utf-8' />   
-        <style>
-            @media (prefers-color-scheme: dark){{
-                body {{
-                    color: #dddddd;
-                }}
-            }}
-            @media (prefers-color-scheme: light){{
-                body {{
-                    color: #000000;
-                }}
-            }}
-        </style>
-    </head>
-    <body>
-		");
+            this.Write("\r\n<DOCTYPE html>\r\n<html>\r\n    <head>\r\n        <meta charset=\'utf-8\' />\r\n        <" +
+                    "style>\r\n            ");
             
-            #line 26 "C:\Users\me_la\source\repos\TheRandomizer\src\TheRandomizer.Maui\Resources\Templates\Output.tt"
+            #line 13 "C:\Users\me_la\source\repos\TheRandomizer\src\TheRandomizer.Maui\Resources\Templates\Output.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Style));
+            
+            #line default
+            #line hidden
+            this.Write("\r\n\t\t\t");
+            
+            #line 14 "C:\Users\me_la\source\repos\TheRandomizer\src\TheRandomizer.Maui\Resources\Templates\Output.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(CustomCSS));
+            
+            #line default
+            #line hidden
+            this.Write("\r\n        </style>\r\n    </head>\r\n    <body>\r\n\t\t");
+            
+            #line 18 "C:\Users\me_la\source\repos\TheRandomizer\src\TheRandomizer.Maui\Resources\Templates\Output.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Content.Format switch 
 			{
 				OutputFormats.Html => Content.Text,
