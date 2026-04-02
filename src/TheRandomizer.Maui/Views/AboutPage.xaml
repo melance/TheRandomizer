@@ -45,6 +45,11 @@
                     Url="{Binding Subreddit}"
                     Text="{Binding Subreddit}" />
             </HorizontalStackLayout>
+            <Border 
+                HeightRequest="1"
+                StrokeThickness="1"
+                Stroke="{AppThemeBinding Light=#DDD, Dark=#444}"
+                Margin="0,6" />
             <HorizontalStackLayout Spacing="8">
                 <Label
                     Text="Generator Directory" Style="{StaticResource Muted}" />
@@ -72,6 +77,21 @@
                         <TapGestureRecognizer
                             Command="{Binding CopyPathCommand}"
                             CommandParameter="{Binding ThemeDirectory}" />
+                    </Label.GestureRecognizers>
+                </Label>
+            </HorizontalStackLayout>
+            <HorizontalStackLayout Spacing="8">
+                <Label
+                    Text="Custom CSS Location" Style="{StaticResource Muted}" />
+                <Label
+                    Text="{Binding CustomCSSFile}" />
+                <Label
+                    Style="{DynamicResource Link}"
+                    Text="Copy">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer
+                            Command="{Binding CopyPathCommand}"
+                            CommandParameter="{Binding CustomCSSFile}" />
                     </Label.GestureRecognizers>
                 </Label>
             </HorizontalStackLayout>

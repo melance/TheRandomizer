@@ -18,6 +18,7 @@ public partial class AboutViewModel(IGeneratorFolderService folderService,
     public String Author => AppMetadata.Author;
     public String GeneratorDirectory => _folderService.GetCurrentFolderAsync().Result;
     public String ThemeDirectory => _themeService.ThemesFolder;
+    public String CustomCSSFile => _themeService.CustomCSSFile;
     public String GitHubUrl => AppMetadata.GitHubUrl;
     public String Subreddit => AppMetadata.Subreddit;
 
